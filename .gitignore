@@ -1,0 +1,15 @@
+/.vs/
+/Library/
+/Temp/
+/ChineseTower.CSharp.Editor.csproj
+/ChineseTower.CSharp.csproj
+/ChineseTower.sln
+/ChinesePokerTower.CSharp.Editor.csproj
+/ChinesePokerTower.CSharp.csproj
+/ChinesePokerTower.sln
+/SelfiePoker.sln
+/Assets/StreamingAssets/crashlytics-build.properties
+/Assets/StreamingAssets/crashlytics-build.properties.meta
+*.CSharp.Plugins.csproj
+*.csproj
+/ChinesePokerTower.sln.DotSettings
