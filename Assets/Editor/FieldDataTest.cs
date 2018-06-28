@@ -8,19 +8,25 @@ using UnityEngine;
 public class FieldDataTest
 {
     [Test]
-    public void FirstTest()
+    public void PositionToIdTest()
     {
         var levelDescription = new LevelDescription();
-        levelDescription.Width = 8;
-        levelDescription.Height = 8;
+        levelDescription.Width = 2;
+        levelDescription.Height = 2;
         levelDescription.ColorCount = 5;
         levelDescription.Time = 60;
 
-        var entityManager = new EntityManager();
-        //Game.CreateSlots(levelDescription, entityManager);
+        var game = new GameObject().AddComponent<Game>();
+        game.Level = ScriptableObject.CreateInstance<LevelDescriptionAsset>();
+        game.Level.Value = levelDescription;
 
-        Assert.AreEqual(64, entityManager.GetAllEntities().Length);
+        game.Center = new GameObject("Center").transform;
+        game.Center.position = new Vector3(1,1,0);
 
+        Assert.AreEqual(0, game.GetIndex(new Vector3(0.5f, 0.5f)));
+        Assert.AreEqual(1, game.GetIndex(new Vector3(1.5f, 0.5f)));
+        Assert.AreEqual(2, game.GetIndex(new Vector3(0.5f, 1.5f)));
+        Assert.AreEqual(3, game.GetIndex(new Vector3(1.5f, 1.5f)));
     }
 
 }
