@@ -27,6 +27,7 @@ public class MoveChipsToPositionSystem : ComponentSystem
     protected override void OnUpdate()
     {
         var dt = Time.deltaTime;
+        bool anyCompleted = false;
         for (int i = 0; i < _movingChips.Length; i++)
         {
             var target = _movingChips.TargetPosition[i];
@@ -38,8 +39,8 @@ public class MoveChipsToPositionSystem : ComponentSystem
                 var movingTilesEntity = _movingChips.Entities[i];
                 PostUpdateCommands.RemoveComponent<TargetPosition>(movingTilesEntity);
                 PostUpdateCommands.RemoveComponent<AnimationTime>(movingTilesEntity);
-                PostUpdateCommands.CreateEntity();
-                PostUpdateCommands.AddComponent(new SwapFinished());
+                anyCompleted = true;
+
             }
             else
             {
@@ -51,6 +52,12 @@ public class MoveChipsToPositionSystem : ComponentSystem
             }
 
             _movingChips.CurrentPosition[i] = current;
+        }
+
+        if (anyCompleted)
+        {
+            PostUpdateCommands.CreateEntity();
+            PostUpdateCommands.AddComponent(new AnalyzeField());
         }
     }
 }

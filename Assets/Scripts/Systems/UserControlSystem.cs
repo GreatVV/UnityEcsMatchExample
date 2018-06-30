@@ -11,7 +11,7 @@ public class UserControlSystem : ComponentSystem
     private Camera Camera => _game.Camera;
     private Game _game;
 
-    public struct NotSelectedTilesData
+    public struct NotSelectedChips
     {
         public int Length;
         public EntityArray Entities;
@@ -27,15 +27,15 @@ public class UserControlSystem : ComponentSystem
         [ReadOnly] public ComponentDataArray<Selected> Selected;
     }
 
-    public struct MovingTiles
+    public struct MovingChips
     {
         public int Length;
         [ReadOnly] public ComponentDataArray<TargetPosition> TargetPosition;
     }
 
-    [Inject] private NotSelectedTilesData _nonSelected;
+    [Inject] private NotSelectedChips _nonSelected;
     [Inject] private SelectedTilesData _selected;
-    [Inject] private MovingTiles _movingTiles;
+    [Inject] private MovingChips _movingChips;
 
     protected override void OnCreateManager(int capacity)
     {
@@ -50,7 +50,7 @@ public class UserControlSystem : ComponentSystem
     {
         if (Input.GetMouseButtonDown(0))
         {
-            if (_movingTiles.Length > 0)
+            if (_movingChips.Length > 0)
             {
                 return;
             }
@@ -62,16 +62,16 @@ public class UserControlSystem : ComponentSystem
                 var position = EntityManager.GetComponentData<SlotPosition>(_nonSelected.Slots[i].Value).Value;
                 if (position.x == clickPosition.x && position.y == clickPosition.y)
                 {
-                    var entity = _nonSelected.Entities[i];
-                    if (EntityManager.HasComponent(entity, ComponentType.Create<Selected>()))
+                    var chip = _nonSelected.Entities[i];
+                    if (EntityManager.HasComponent(chip, ComponentType.Create<Selected>()))
                     {
-                        EntityManager.RemoveComponent<Selected>(entity);
+                        EntityManager.RemoveComponent<Selected>(chip);
                     }
                     else
                     {
                         if (_selected.Length == 0)
                         {
-                            EntityManager.AddComponentData(entity, new Selected()
+                            EntityManager.AddComponentData(chip, new Selected()
                             {
                                 Number = 1
                             });
@@ -86,7 +86,7 @@ public class UserControlSystem : ComponentSystem
                             if (FieldUtils.NextToEachOther(previousSelectedPosition.Value, position))
                             {
 
-                                EntityManager.AddComponentData(entity, new Selected()
+                                EntityManager.AddComponentData(chip, new Selected()
                                 {
                                     Number = 2
                                 });

@@ -6,16 +6,9 @@ using Unity.Mathematics;
 public struct TargetPosition : IComponentData
 {
     public float3 Value;
-}
 
-[Serializable]
-public struct AnimationTime : IComponentData
-{
-    public float Value;
-}
-
-[Serializable]
-public struct SwapFinished : IComponentData
-{
-
+    public TargetPosition(float3 value)
+    {
+        Value = value;
+    }
 }

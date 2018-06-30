@@ -1,5 +1,7 @@
 ﻿using System;
+using Unity.Entities;
 using Unity.Mathematics;
+using Unity.Transforms;
 
 public static class FieldUtils
 {
@@ -95,5 +97,31 @@ public static class FieldUtils
         }
 
         return false;
+    }
+
+    public static void MoveChipToSlot(EntityManager entityManager, Entity chip, Entity slot)
+    {
+        var previousSlot = entityManager.GetComponentData<SlotReference>(chip).Value;
+        entityManager.RemoveComponent<ChipReference>(previousSlot);
+        entityManager.SetComponentData(chip, new SlotReference() {Value = slot});
+        entityManager.AddComponentData(slot, new ChipReference() {Value = chip});
+        if (entityManager.HasComponent<TargetPosition>(chip))
+        {
+            entityManager.SetComponentData(chip, new TargetPosition()
+                {
+                    Value = entityManager.GetComponentData<Position>(slot).Value
+                }
+            );
+            entityManager.SetComponentData(chip, new AnimationTime());
+        }
+        else
+        {
+            entityManager.AddComponentData(chip, new TargetPosition()
+                {
+                    Value = entityManager.GetComponentData<Position>(slot).Value
+                }
+            );
+            entityManager.AddComponentData(chip, new AnimationTime());
+        }
     }
 }

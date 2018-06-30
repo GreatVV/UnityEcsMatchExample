@@ -1,6 +1,6 @@
 ﻿public enum ChipColor : int
 {
-    Random = -112,
+    Random = -1,
     Blue = 0,
     Green = 1,
     Purple = 2,
@@ -10,5 +10,6 @@
 
 public enum ChipType
 {
-
+    None = -1,
+    Simple = 0,
 }

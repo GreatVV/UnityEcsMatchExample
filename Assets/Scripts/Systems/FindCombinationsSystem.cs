@@ -1,4 +1,5 @@
-﻿using Unity.Collections;
+﻿using System.Collections.Generic;
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
@@ -16,63 +17,86 @@ public class FindCombinationsSystem : ComponentSystem
         public ComponentDataArray<SlotPosition> Positions;
     }
 
-    public struct MoveFinished
+    public struct SwapFinishedData
     {
         public int Length;
         public EntityArray Entities;
-        public ComponentDataArray<SwapFinished> Swaps;
+        public ComponentDataArray<PlayerSwap> PlayerSwap;
     }
 
+    public struct AnalyzeFieldFlag
+    {
+        public int Length;
+        public ComponentDataArray<AnalyzeField> AnalyzeField;
+        public EntityArray Entities;
+    }
+
+    [Inject] private SwapFinishedData _swaps;
     [Inject] private AllSlots _allSlots;
-    [Inject] private MoveFinished _moveFinished;
+    [Inject] private AnalyzeFieldFlag _analyzeFieldFlag;
+
+    private Dictionary<int2, Entity> _slotCache;
+
+    public void Setup(Dictionary<int2, Entity> slotCache)
+    {
+        _slotCache = slotCache;
+    }
 
     protected override void OnUpdate()
     {
-        if (_moveFinished.Length == 0)
+        if (_analyzeFieldFlag.Length == 0)
         {
             return;
         }
 
-        for (int i = 0; i < _moveFinished.Length; i++)
+        for (int i = 0; i < _analyzeFieldFlag.Length; i++)
         {
-            PostUpdateCommands.DestroyEntity(_moveFinished.Entities[i]);
+            PostUpdateCommands.AddComponent(_analyzeFieldFlag.Entities[i], new DestroyData());
         }
 
+        var visited = new NativeHashMap<int2, bool>(_slotCache.Count, Allocator.Temp);
 
-        //todo fix size to dynamic based on level data
-
-        var visited = new NativeHashMap<int2, bool>(64, Allocator.Temp);
-
-        NativeArray<Entity> array = new NativeArray<Entity>(_allSlots.EntityArray.Length, Allocator.Temp);
-        _allSlots.EntityArray.CopyTo(array, 0);
+        var anyCombination = false;
 
         for (int i = 0; i < _allSlots.Length; i++)
         {
             var position = _allSlots.Positions[i];
-            NativeList<Entity> solution = new NativeList<Entity>(64, Allocator.Temp);
-            Find(EntityManager, ref array, position.Value, ref visited, ref solution );
+            var solution = new NativeList<Entity>(_slotCache.Count, Allocator.Temp);
+            Find(EntityManager, _slotCache, position.Value, ref visited, ref solution);
 
             if (solution.Length >= 3)
             {
+                anyCombination = true;
+                Debug.Log("Combinations");
+                for (int j = 0; j < solution.Length; j++)
+                {
+                    Debug.Log(EntityManager.GetComponentData<SlotPosition>(solution[j]).Value);
+                }
+
                 for (int j = solution.Length - 1; j >= 0; j--)
                 {
-                    var chip = EntityManager.GetComponentData<ChipReference>(solution[j]).Value;
-                    if (EntityManager.Exists(chip))
-                    {
-                        PostUpdateCommands.DestroyEntity(chip);
-                    }
-
-                    PostUpdateCommands.RemoveComponent<ChipReference>(solution[j]);
+                    var slot = solution[j];
+                    var chip = EntityManager.GetComponentData<ChipReference>(slot).Value;
+                    PostUpdateCommands.DestroyEntity(chip);
+                    PostUpdateCommands.RemoveComponent<ChipReference>(slot);
                 }
             }
+
             solution.Dispose();
         }
 
-        array.Dispose();
+        for (int i = 0; i < _swaps.Length; i++)
+        {
+            PostUpdateCommands.AddComponent(_swaps.Entities[i], new SwapSuccess()
+            {
+                Value = anyCombination ? SwapResult.Success : SwapResult.Fail
+            });
+        }
+
         visited.Dispose();
     }
 
-    public static void Visit(EntityManager entityManager, int2 position, ref NativeHashMap<int2, bool> visited, ref NativeHashMap<int2, Entity> positions, ref NativeList<Entity> list)
+    public static void Visit(EntityManager entityManager, int2 position, ref NativeHashMap<int2, bool> visited, Dictionary<int2, Entity> positions, ref NativeList<Entity> list)
     {
         bool visitedSlot;
         if (visited.TryGetValue(position, out visitedSlot))
@@ -85,32 +109,38 @@ public class FindCombinationsSystem : ComponentSystem
         {
             return;
         }
-        var neighbours = entityManager.GetComponentData<PossibleNeighbours>(slot).Value;
         visited.TryAdd(position, true);
+        if (!entityManager.HasComponent<ChipReference>(slot))
+        {
+            return;
+        }
+
+
+        var neighbours = entityManager.GetComponentData<PossibleNeighbours>(slot).Value;
         list.Add(slot);
 
-        if (IsSameColor(entityManager, Neighbours.Top, neighbours, position, slot, ref positions))
+        if (IsSameColor(entityManager, Neighbours.Top, neighbours, position, slot, positions))
                  {
-                     Visit(entityManager, position + FieldUtils.NeighbourToInt2(Neighbours.Top), ref visited, ref positions, ref list);
+                     Visit(entityManager, position + FieldUtils.NeighbourToInt2(Neighbours.Top), ref visited, positions, ref list);
                  }
 
-        if (IsSameColor(entityManager, Neighbours.Bottom, neighbours, position, slot, ref positions))
+        if (IsSameColor(entityManager, Neighbours.Bottom, neighbours, position, slot, positions))
         {
-            Visit(entityManager, position + FieldUtils.NeighbourToInt2(Neighbours.Bottom), ref visited, ref positions, ref list);
+            Visit(entityManager, position + FieldUtils.NeighbourToInt2(Neighbours.Bottom), ref visited, positions, ref list);
         }
 
-        if (IsSameColor(entityManager, Neighbours.Left, neighbours, position, slot, ref positions))
+        if (IsSameColor(entityManager, Neighbours.Left, neighbours, position, slot, positions))
         {
-            Visit(entityManager, position + FieldUtils.NeighbourToInt2(Neighbours.Left), ref visited, ref positions, ref list);
+            Visit(entityManager, position + FieldUtils.NeighbourToInt2(Neighbours.Left), ref visited, positions, ref list);
         }
 
-        if (IsSameColor(entityManager, Neighbours.Right, neighbours, position, slot, ref positions))
+        if (IsSameColor(entityManager, Neighbours.Right, neighbours, position, slot, positions))
         {
-            Visit(entityManager, position + FieldUtils.NeighbourToInt2(Neighbours.Right), ref visited, ref positions, ref list);
+            Visit(entityManager, position + FieldUtils.NeighbourToInt2(Neighbours.Right), ref visited, positions, ref list);
         }
     }
 
-    private static bool IsSameColor(EntityManager entityManager, Neighbours target, Neighbours neighbours, int2 position, Entity slot, ref NativeHashMap<int2, Entity> positions)
+    private static bool IsSameColor(EntityManager entityManager, Neighbours target, Neighbours neighbours, int2 position, Entity slot, Dictionary<int2, Entity> positions)
     {
         if ((target & neighbours) == 0)
         {
@@ -122,6 +152,11 @@ public class FindCombinationsSystem : ComponentSystem
         if (positions.TryGetValue(position, out entity))
         {
             var currentColor = entityManager.GetComponentData<Chip>(entityManager.GetComponentData<ChipReference>(slot).Value).Color;
+            if (!entityManager.HasComponent<ChipReference>(entity))
+            {
+                return false;
+            }
+
             var newColor = entityManager.GetComponentData<Chip>(entityManager.GetComponentData<ChipReference>(entity).Value).Color;
             if (newColor == currentColor)
             {
@@ -133,30 +168,13 @@ public class FindCombinationsSystem : ComponentSystem
 
     }
 
-    public static void Find(EntityManager entityManager, ref NativeArray<Entity> slots, int2 targetSlotPosition, ref NativeHashMap<int2, bool> visited, ref NativeList<Entity> solution)
+    public static void Find(EntityManager entityManager, Dictionary<int2, Entity> positions,  int2 targetSlotPosition, ref NativeHashMap<int2, bool> visited, ref NativeList<Entity> solution)
     {
-        var positions = new NativeHashMap<int2, Entity>(64, Allocator.Temp);
-
-
-        //hash positions
-        for (int i = 0; i < slots.Length; i++)
-        {
-            var position = entityManager.GetComponentData<SlotPosition>(slots[i]);
-            positions.TryAdd(position.Value, slots[i]);
-        }
-
         bool status;
 
         if (!visited.TryGetValue(targetSlotPosition, out status))
         {
-            Visit(entityManager, targetSlotPosition, ref visited, ref positions, ref solution);
-            Debug.Log("Combinations");
-            for (int j = 0; j < solution.Length; j++)
-            {
-                Debug.Log(entityManager.GetComponentData<SlotPosition>(solution[j]).Value);
-            }
+            Visit(entityManager, targetSlotPosition, ref visited, positions, ref solution);
         }
-
-        positions.Dispose();
     }
 }

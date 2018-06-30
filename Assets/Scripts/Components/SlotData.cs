@@ -6,4 +6,9 @@ using Unity.Entities;
 public struct SlotReference : IComponentData
 {
     public Entity Value;
+
+    public SlotReference(Entity value)
+    {
+        Value = value;
+    }
 }

@@ -5,4 +5,9 @@ using Unity.Entities;
 public struct ChipReference : IComponentData
 {
     public Entity Value;
+
+    public ChipReference(Entity value)
+    {
+        Value = value;
+    }
 }

@@ -17,26 +17,26 @@ public class Game : MonoBehaviour
 	public LevelDescription LevelDescription;
 	private float AnimationTime = 0.5f;
 
+	public readonly Dictionary<int2, Entity> SlotCache = new Dictionary<int2, Entity>();
+
 	public void Start()
 	{
 		LevelDescription = Level.Value;
 		_entityManager = World.Active.GetOrCreateManager<EntityManager>();
 		ProcessLevelDescription();
-	}
+		World.Active.GetOrCreateManager<UserControlSystem>().Setup(this);
+		World.Active.GetOrCreateManager<MoveChipsToPositionSystem>().Setup(AnimationTime);
+		World.Active.GetOrCreateManager<FindCombinationsSystem>().Setup(SlotCache);
+		World.Active.GetOrCreateManager<FallSystem>().Setup(SlotCache, LevelDescription);
 
-	[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-	public static void InitializeWithScene()
-	{
-		var game = FindObjectOfType<Game>();
-		World.Active.GetOrCreateManager<UserControlSystem>().Setup(game);
-		World.Active.GetOrCreateManager<MoveChipsToPositionSystem>().Setup(game.AnimationTime);
+		_entityManager.CreateEntity(typeof(AnalyzeField));
 	}
 
 	public void ProcessLevelDescription()
 	{
 		var steps = new List<ICreationPipelineStep>();
-		steps.Add(new CreateSlotsStep());
-		steps.Add(new CreateChipsStep(ChipPrefabs, Center.position));
+		steps.Add(new CreateSlotsStep(SlotCache, Center.position));
+		steps.Add(new CreateChipsStep(ChipPrefabs));
 
 		foreach (var creationPipelineStep in steps)
 		{

@@ -10,22 +10,8 @@ using Unity.Transforms;
 using UnityEngine;
 
 [TestFixture]
-public class FieldDataTest
+public class FieldDataTest : BaseWorldTests
 {
-    [SetUp]
-    public void EcsSetup()
-    {
-        World.DisposeAllWorlds();
-        World w = new World("Test World");
-        World.Active = w;
-    }
-
-    [TearDown]
-    public void TearDown()
-    {
-        World.Active.Dispose();
-    }
-
     [Test]
     public void PositionToIdTest()
     {
@@ -48,20 +34,7 @@ public class FieldDataTest
         Assert.AreEqual(new int2(1, 1), game.GetIndex(new Vector3(1.5f, 1.5f)));
     }
 
-    private GameObject CreateChipPrefab(ChipColor color = 0)
-    {
-        var go = new GameObject("Tile",
-            typeof(GameObjectEntity),
-            typeof(ChipComponent),
-            typeof(PositionComponent),
-            typeof(TransformMatrixComponent),
-            typeof(MeshInstanceRendererComponent),
-            typeof(SlotComponent));
 
-        go.GetComponent<ChipComponent>().UpdateColor(color);
-
-        return go;
-    }
 
     [Test]
     public void CreateSlots()
@@ -74,7 +47,7 @@ public class FieldDataTest
             Height = 5
         };
 
-        var creationPipeline = new CreateSlotsStep();
+        var creationPipeline = new CreateSlotsStep(new Dictionary<int2, Entity>(), Vector3.zero);
         creationPipeline.Apply(levelDescription, entityManager);
 
         //check
@@ -103,10 +76,10 @@ public class FieldDataTest
             Height = 5
         };
 
-        var createSlots = new CreateSlotsStep();
+        var createSlots = new CreateSlotsStep(new Dictionary<int2, Entity>(), Vector3.zero);
         createSlots.Apply(levelDescription, entityManager);
 
-        var createChips = new CreateChipsStep(new[] {CreateChipPrefab()}, Vector3.zero);
+        var createChips = new CreateChipsStep(new[] {CreateChipPrefab()});
         createChips.Apply(levelDescription, entityManager);
 
         //check
@@ -186,10 +159,10 @@ public class FieldDataTest
             }
         };
 
-        var createSlots = new CreateSlotsStep();
+        var slotCache = new Dictionary<int2, Entity>();
+        var createSlots = new CreateSlotsStep(slotCache, Vector3.zero);
         createSlots.Apply(levelDescription, entityManager);
-        var slots = new NativeArray<Entity>(9, Allocator.Temp);
-        FillWithComponents<Slot>(entityManager, ref slots);
+
 
         var createChips = new CreateChipsStep(new[]
         {
@@ -198,25 +171,25 @@ public class FieldDataTest
             CreateChipPrefab((ChipColor)2),
             CreateChipPrefab((ChipColor)3),
             CreateChipPrefab((ChipColor)4),
-        }, Vector3.zero);
+        });
         createChips.Apply(levelDescription, entityManager);
 
         var commandBuffer = new EntityCommandBuffer(Allocator.Temp);
         var combinationList = new NativeList<Entity>(64, Allocator.Temp);
         var visited = new NativeHashMap<int2, bool>(64, Allocator.Temp);
 
-        FindCombinationsSystem.Find(entityManager, ref slots, new int2(0,0), ref visited, ref combinationList);
+        FindCombinationsSystem.Find(entityManager, slotCache, new int2(0,0), ref visited, ref combinationList);
         Assert.AreEqual(3, combinationList.Length);
 
         combinationList.Clear();
-        FindCombinationsSystem.Find(entityManager, ref slots, new int2(0,1), ref visited, ref combinationList);
+        FindCombinationsSystem.Find(entityManager, slotCache,  new int2(0,1), ref visited, ref combinationList);
         Assert.AreEqual(3, combinationList.Length);
 
         combinationList.Clear();
-        FindCombinationsSystem.Find(entityManager, ref slots, new int2(0,2), ref visited, ref combinationList);
+        FindCombinationsSystem.Find(entityManager,slotCache,  new int2(0,2), ref visited, ref combinationList);
         Assert.AreEqual(3, combinationList.Length);
 
-        slots.Dispose();
+
         combinationList.Dispose();
     }
 
@@ -282,10 +255,10 @@ public class FieldDataTest
             }
         };
 
-        var createSlots = new CreateSlotsStep();
+        var slotCache = new Dictionary<int2, Entity>();
+        var createSlots = new CreateSlotsStep(slotCache, Vector3.zero);
         createSlots.Apply(levelDescription, entityManager);
-        var slots = new NativeArray<Entity>(9, Allocator.Temp);
-        FillWithComponents<Slot>(entityManager, ref slots);
+
 
         var createChips = new CreateChipsStep(new[]
         {
@@ -294,44 +267,27 @@ public class FieldDataTest
             CreateChipPrefab((ChipColor)2),
             CreateChipPrefab((ChipColor)3),
             CreateChipPrefab((ChipColor)4),
-        }, Vector3.zero);
+        });
         createChips.Apply(levelDescription, entityManager);
 
         var combinationList = new NativeList<Entity>(64, Allocator.Temp);
 
         var visited = new NativeHashMap<int2, bool>(64, Allocator.Temp);
 
-        FindCombinationsSystem.Find(entityManager, ref slots, new int2(0,0), ref visited, ref combinationList);
+        FindCombinationsSystem.Find(entityManager, slotCache,  new int2(0,0), ref visited, ref combinationList);
         Assert.AreEqual(9, combinationList.Length);
 
         visited.Clear();
         combinationList.Clear();
-        FindCombinationsSystem.Find(entityManager, ref slots, new int2(0,1), ref visited, ref combinationList);
+        FindCombinationsSystem.Find(entityManager,slotCache,  new int2(0,1), ref visited, ref combinationList);
         Assert.AreEqual(9, combinationList.Length);
 
         visited.Clear();
         combinationList.Clear();
-        FindCombinationsSystem.Find(entityManager, ref slots, new int2(0,2),ref visited,  ref combinationList);
+        FindCombinationsSystem.Find(entityManager, slotCache,new int2(0,2),ref visited,  ref combinationList);
         Assert.AreEqual(9, combinationList.Length);
 
-        slots.Dispose();
         visited.Dispose();
         combinationList.Dispose();
-    }
-
-    private void FillWithComponents<T>(EntityManager entityManager, ref NativeArray<Entity> slots)
-    {
-        var i = 0;
-        var allEntities = entityManager.GetAllEntities(Allocator.Temp);
-        for (int j = 0; j < allEntities.Length; j++)
-        {
-            if (entityManager.HasComponent<Slot>(allEntities[j]))
-            {
-                slots[i] = allEntities[j];
-                i++;
-            }
-        }
-
-        allEntities.Dispose();
     }
 }

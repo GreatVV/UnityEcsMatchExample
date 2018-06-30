@@ -1,5 +1,7 @@
-﻿using Unity.Entities;
+﻿using Unity.Collections;
+using Unity.Entities;
 using Unity.Transforms;
+using UnityEngine;
 
 public class SwapChipsSystem : ComponentSystem
 {
@@ -8,47 +10,52 @@ public class SwapChipsSystem : ComponentSystem
         public int Length;
         public EntityArray Entities;
         public ComponentDataArray<Selected> Selected;
+        [ReadOnly]
         public ComponentDataArray<Position> Position;
         public ComponentDataArray<SlotReference> SlotReference;
     }
 
-    [Inject] private SelectedChips _selected;
+    [Inject] private SelectedChips _selectedChips;
 
     protected override void OnUpdate()
     {
-        if (_selected.Length == 2)
+        if (_selectedChips.Length == 2)
         {
-            var tempSlotReference = _selected.SlotReference[0];
-            _selected.SlotReference[0] = _selected.SlotReference[1];
-            _selected.SlotReference[1] = tempSlotReference;
+            PostUpdateCommands.CreateEntity();
+            var firstChip = _selectedChips.Entities[0];
+            var secondChip = _selectedChips.Entities[1];
 
-            var firstSlot = _selected.SlotReference[0].Value;
-            EntityManager.SetComponentData(firstSlot, new ChipReference() {Value = _selected.Entities[0]});
+            PostUpdateCommands.AddComponent(
+                new PlayerSwap() {
+                First = firstChip,
+                Second = secondChip
+                    });
 
-            var secondSlot = _selected.SlotReference[1].Value;
-            EntityManager.SetComponentData(secondSlot, new ChipReference() {Value = _selected.Entities[1]});
+            var tempSlotReference = _selectedChips.SlotReference[0];
+            _selectedChips.SlotReference[0] = _selectedChips.SlotReference[1];
+            _selectedChips.SlotReference[1] = tempSlotReference;
 
-            var position1 = _selected.Position[0].Value;
-            var position2 = _selected.Position[1].Value;
+            var firstSlot = _selectedChips.SlotReference[0].Value;
+            EntityManager.SetComponentData(firstSlot, new ChipReference(firstChip));
 
-            PostUpdateCommands.AddComponent(_selected.Entities[0], new TargetPosition()
-            {
-                Value = position2
-            });
-            PostUpdateCommands.AddComponent(_selected.Entities[0], new AnimationTime());
+            var secondSlot = _selectedChips.SlotReference[1].Value;
+            EntityManager.SetComponentData(secondSlot, new ChipReference(secondChip));
 
-            PostUpdateCommands.AddComponent(_selected.Entities[1], new TargetPosition()
-            {
-                Value = position1
-            });
-            PostUpdateCommands.AddComponent(_selected.Entities[1], new AnimationTime());
+            var position1 = _selectedChips.Position[0].Value;
+            var position2 = _selectedChips.Position[1].Value;
+
+            PostUpdateCommands.AddComponent(firstChip, new TargetPosition(position2));
+            PostUpdateCommands.AddComponent(firstChip, new AnimationTime());
+
+            PostUpdateCommands.AddComponent(secondChip, new TargetPosition(position1));
+            PostUpdateCommands.AddComponent(secondChip, new AnimationTime());
         }
 
-        if (_selected.Length >= 2)
+        if (_selectedChips.Length >= 2)
         {
-            for (int i = _selected.Length - 1; i >= 0; i--)
+            for (int i = _selectedChips.Length - 1; i >= 0; i--)
             {
-                PostUpdateCommands.RemoveComponent<Selected>(_selected.Entities[i]);
+                PostUpdateCommands.RemoveComponent<Selected>(_selectedChips.Entities[i]);
             }
         }
     }
