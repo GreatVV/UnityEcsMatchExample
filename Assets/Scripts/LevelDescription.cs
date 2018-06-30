@@ -35,7 +35,22 @@ public class LevelDescription
 				SlotChipDescriptions.Add(newSlotChipDescription);
 			}
 		}
+
+		for (int i = 0; i < Width; i++)
+		{
+			for (int j = 0; j < Height; j++)
+			{
+				var newSlotDescription = new SlotDescription()
+				{
+					Position = new int2(i, j),
+					Generator = j == Height - 1
+				};
+				SlotDescriptions.Add(newSlotDescription);
+			}
+		}
 	}
+
+	public List<SlotDescription> SlotDescriptions = new List<SlotDescription>();
 
 	public List<SlotChipDescription> SlotChipDescriptions = new List<SlotChipDescription>();
 
@@ -54,5 +69,15 @@ public class LevelDescription
 		}
 
 		return DefaultChipDescription;
+	}
+
+	public SlotDescription GetSlotDescription(int2 position)
+	{
+		foreach (var x in SlotDescriptions)
+		{
+			if (x.Position.x == position.x && x.Position.y == position.y) return x;
+		}
+
+		return new SlotDescription();
 	}
 }

@@ -20,7 +20,7 @@ public class BaseWorldTests
         World.Active.Dispose();
     }
 
-    protected GameObject CreateChipPrefab(ChipColor color = 0)
+    protected GameObjectEntity CreateChipPrefab(ChipColor color = 0)
     {
         var go = new GameObject("Tile",
             typeof(GameObjectEntity),
@@ -32,6 +32,6 @@ public class BaseWorldTests
 
         go.GetComponent<ChipComponent>().UpdateColor(color);
 
-        return go;
+        return go.GetComponent<GameObjectEntity>();
     }
 }

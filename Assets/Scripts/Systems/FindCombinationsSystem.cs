@@ -22,6 +22,7 @@ public class FindCombinationsSystem : ComponentSystem
         public int Length;
         public EntityArray Entities;
         public ComponentDataArray<PlayerSwap> PlayerSwap;
+        public SubtractiveComponent<SwapSuccess> SwapSuccess;
     }
 
     public struct AnalyzeFieldFlag

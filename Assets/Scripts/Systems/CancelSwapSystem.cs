@@ -12,14 +12,14 @@ public class CancelSwapSystem : ComponentSystem
         public ComponentDataArray<SwapSuccess> SwapsSuccess;
     }
 
-    [Inject] private SwapFinishedData _swapFinishedData;
+    [Inject] private SwapFinishedData _swaps;
 
     protected override void OnUpdate()
     {
-        for (int i = 0; i < _swapFinishedData.Length; i++)
+        for (int i = 0; i < _swaps.Length; i++)
         {
-            var playerSwap = _swapFinishedData.Swaps[i];
-            if (_swapFinishedData.SwapsSuccess[i].Value == SwapResult.Fail)
+            var playerSwap = _swaps.Swaps[i];
+            if (_swaps.SwapsSuccess[i].Value == SwapResult.Fail)
             {
                 var slot1 = EntityManager.GetComponentData<SlotReference>(playerSwap.First).Value;
                 var slot2 = EntityManager.GetComponentData<SlotReference>(playerSwap.Second).Value;
@@ -34,7 +34,7 @@ public class CancelSwapSystem : ComponentSystem
                 PostUpdateCommands.AddComponent(playerSwap.Second, new TargetPosition(EntityManager.GetComponentData<Position>(slot1).Value));
                 PostUpdateCommands.AddComponent(playerSwap.Second, new AnimationTime());
             }
-            PostUpdateCommands.AddComponent(_swapFinishedData.Entities[i], new DestroyData());
+            PostUpdateCommands.AddComponent(_swaps.Entities[i], new DestroyData());
         }
     }
 }

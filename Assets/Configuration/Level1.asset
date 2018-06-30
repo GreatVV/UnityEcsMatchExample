@@ -16,3 +16,43 @@ MonoBehaviour:
     Height: 8
     ColorCount: 5
     Time: 60
+    SlotDescriptions:
+    - Position:
+        x: 0
+        y: 7
+      Generator: 1
+    - Position:
+        x: 1
+        y: 7
+      Generator: 1
+    - Position:
+        x: 2
+        y: 7
+      Generator: 1
+    - Position:
+        x: 3
+        y: 7
+      Generator: 1
+    - Position:
+        x: 4
+        y: 7
+      Generator: 1
+    - Position:
+        x: 5
+        y: 7
+      Generator: 1
+    - Position:
+        x: 6
+        y: 7
+      Generator: 1
+    - Position:
+        x: 7
+        y: 7
+      Generator: 1
+    SlotChipDescriptions: []
+    DefaultChipDescription:
+      Position:
+        x: 0
+        y: 0
+      ChipType: 0
+      Color: -1
