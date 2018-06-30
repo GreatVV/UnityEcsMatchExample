@@ -1,4 +1,5 @@
-﻿using System.Runtime.Serialization.Formatters;
+﻿using System.Collections.Generic;
+using System.Runtime.Serialization.Formatters;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
@@ -8,22 +9,16 @@ using UnityEngine;
 
 public class UserControlSystem : ComponentSystem
 {
-    private Camera Camera => _game.Camera;
-    private Game _game;
-
-    public struct NotSelectedChips
+    public struct Chips
     {
         public int Length;
-        public EntityArray Entities;
-        [ReadOnly] public ComponentDataArray<SlotReference> Slots;
-        [ReadOnly] public ComponentDataArray<Chip> Tiles;
+        public ComponentDataArray<SlotReference> Slots;
     }
 
     public struct SelectedTilesData
     {
         public int Length;
         public EntityArray Entities;
-        [ReadOnly] public ComponentDataArray<Chip> Tiles;
         [ReadOnly] public ComponentDataArray<Selected> Selected;
     }
 
@@ -33,13 +28,10 @@ public class UserControlSystem : ComponentSystem
         [ReadOnly] public ComponentDataArray<TargetPosition> TargetPosition;
     }
 
-    [Inject] private NotSelectedChips _nonSelected;
     [Inject] private SelectedTilesData _selected;
     [Inject] private MovingChips _movingChips;
-
-    protected override void OnCreateManager(int capacity)
-    {
-    }
+    [Inject] private Chips _chips;
+    private Game _game;
 
     public void Setup(Game game)
     {
@@ -55,49 +47,44 @@ public class UserControlSystem : ComponentSystem
                 return;
             }
 
-            var worldPosition = Camera.ScreenToWorldPoint(Input.mousePosition);
+            var worldPosition = _game.Camera.ScreenToWorldPoint(Input.mousePosition);
             var clickPosition = _game.GetIndex(worldPosition);
-            for (int i = 0; i < _nonSelected.Length; i++)
+            var slot = _game.SlotCache[clickPosition];
+            var position = EntityManager.GetComponentData<SlotPosition>(slot).Value;
+
+            var chip = EntityManager.GetComponentData<ChipReference>(slot).Value;
+            if (EntityManager.HasComponent(chip, ComponentType.Create<Selected>()))
             {
-                var position = EntityManager.GetComponentData<SlotPosition>(_nonSelected.Slots[i].Value).Value;
-                if (position.x == clickPosition.x && position.y == clickPosition.y)
+                PostUpdateCommands.RemoveComponent<Selected>(chip);
+            }
+            else
+            {
+                if (_selected.Length == 0)
                 {
-                    var chip = _nonSelected.Entities[i];
-                    if (EntityManager.HasComponent(chip, ComponentType.Create<Selected>()))
+                    PostUpdateCommands.AddComponent(chip, new Selected()
                     {
-                        EntityManager.RemoveComponent<Selected>(chip);
+                        Number = 1
+                    });
+                }
+                else
+                {
+                    //check if next to previous slot;
+                    var previousSelected = _selected.Entities[0];
+                    var previousSelectedSlot = EntityManager.GetComponentData<SlotReference>(previousSelected).Value;
+                    var previousSelectedPosition = EntityManager.GetComponentData<SlotPosition>(previousSelectedSlot);
+
+                    if (FieldUtils.NextToEachOther(previousSelectedPosition.Value, position))
+                    {
+
+                        PostUpdateCommands.AddComponent(chip, new Selected()
+                        {
+                            Number = 2
+                        });
                     }
                     else
                     {
-                        if (_selected.Length == 0)
-                        {
-                            EntityManager.AddComponentData(chip, new Selected()
-                            {
-                                Number = 1
-                            });
-                        }
-                        else
-                        {
-                            //check if next to previous slot;
-                            var previousSelected = _selected.Entities[0];
-                            var previousSelectedSlot = EntityManager.GetComponentData<SlotReference>(previousSelected).Value;
-                            var previousSelectedPosition = EntityManager.GetComponentData<SlotPosition>(previousSelectedSlot);
-
-                            if (FieldUtils.NextToEachOther(previousSelectedPosition.Value, position))
-                            {
-
-                                EntityManager.AddComponentData(chip, new Selected()
-                                {
-                                    Number = 2
-                                });
-                            }
-                            else
-                            {
-                                PostUpdateCommands.RemoveComponent<Selected>(previousSelected);
-                            }
-                        }
+                        PostUpdateCommands.RemoveComponent<Selected>(previousSelected);
                     }
-                    break;
                 }
             }
         }

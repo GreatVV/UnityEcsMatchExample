@@ -38,17 +38,26 @@ public class GeneratorSystem : ComponentSystem
 
             var slotPosition = _slotGenerators.Positions[i].Value;
 
-            var fall = slotPosition.y - FallSystem.GetNextEmptyRow(EntityManager, _slotCache, slotPosition);
+            var targetY = FallSystem.GetNextEmptyRow(EntityManager, _slotCache, slotPosition);
+            float3 position = EntityManager.GetComponentData<Position>(slot).Value;
+            if (targetY > 0)
+            {
+                targetY-=1;
+                var oneAbove = _slotCache[new int2(slotPosition.x,targetY)];
+                var chipOneAbove = EntityManager.GetComponentData<ChipReference>(oneAbove).Value;
+                position = EntityManager.GetComponentData<Position>(chipOneAbove).Value + new float3(0, 1, 0);
+            }
+
+
 
             var chip = EntityManager.Instantiate(_chipPrefabs[color].gameObject);
             EntityManager.AddComponentData(chip, new SlotReference()
             {
                 Value = slot
             });
-            var position = EntityManager.GetComponentData<Position>(slot).Value;
             EntityManager.SetComponentData(chip, new Position()
             {
-                Value = position + new int3(0, fall, 0)
+                Value = position
             });
             EntityManager.AddComponentData(slot, new ChipReference()
             {
