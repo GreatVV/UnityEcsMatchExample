@@ -140,14 +140,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cc09c2d43822e824ab5544639272b4e7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Camera: {fileID: 519420031}
   Level: {fileID: 11400000, guid: 919b264f5126f5344bb967a3a73d2914, type: 2}
-  TilePrefabs:
+  ChipPrefabs:
   - {fileID: 1521370795991602, guid: d7e6b15d4196792459c754186dec4589, type: 2}
   - {fileID: 1491569639190800, guid: c9ae1af114a8e5f409d45c30cdf25373, type: 2}
   - {fileID: 1441092766763470, guid: c518ff7e9521d8642aebec0b1887cae5, type: 2}
   - {fileID: 1219843458476692, guid: 69c37fe4dbf5fa04586d5eda1217b362, type: 2}
   - {fileID: 1889061272875168, guid: b5b6dc1828ae9004ebb7247f976f1a88, type: 2}
   Center: {fileID: 1828990223}
+  LevelDescription:
+    Width: 8
+    Height: 8
+    ColorCount: 5
+    Time: 60
 --- !u!4 &490150922
 Transform:
   m_ObjectHideFlags: 0

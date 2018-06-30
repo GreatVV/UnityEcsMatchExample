@@ -3,7 +3,7 @@ using System.ComponentModel;
 using Unity.Entities;
 
 [Serializable]
-public struct SlotReference : IComponentData
+public struct Selected : IComponentData
 {
-    public Entity Value;
+    public int Number;
 }

@@ -2,7 +2,7 @@
 using Unity.Entities;
 
 [Serializable]
-public struct Tile : IComponentData
+public struct Slot : IComponentData
 {
-    public int Color;
+
 }

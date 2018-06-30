@@ -1,9 +1,8 @@
 ﻿using System;
-using System.ComponentModel;
 using Unity.Entities;
 
 [Serializable]
-public struct SlotReference : IComponentData
+public struct ChipReference : IComponentData
 {
     public Entity Value;
 }

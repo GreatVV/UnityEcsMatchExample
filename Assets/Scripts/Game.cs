@@ -8,62 +8,49 @@ using UnityEngine;
 
 public class Game : MonoBehaviour
 {
+	public Camera Camera;
 	public LevelDescriptionAsset Level;
-	public GameObject[] TilePrefabs;
-
+	public GameObject[] ChipPrefabs;
 	public Transform Center;
+	private EntityManager _entityManager;
 
+	public LevelDescription LevelDescription;
+	private float AnimationTime = 0.5f;
 
-	void Start()
+	public void Start()
 	{
-		var entityManager = World.Active.GetOrCreateManager<EntityManager>();
-		CreateSlots(Level.Value, entityManager, TilePrefabs, Center);
+		LevelDescription = Level.Value;
+		_entityManager = World.Active.GetOrCreateManager<EntityManager>();
+		ProcessLevelDescription();
 	}
 
 	[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
 	public static void InitializeWithScene()
 	{
-		World.Active.GetOrCreateManager<UserControlSystem>().Setup();
+		var game = FindObjectOfType<Game>();
+		World.Active.GetOrCreateManager<UserControlSystem>().Setup(game);
+		World.Active.GetOrCreateManager<MoveChipsToPositionSystem>().Setup(game.AnimationTime);
 	}
 
-	public static float3 GetPosition(int x, int y, int width, int height, float3 center)
+	public void ProcessLevelDescription()
 	{
-		return new float3(
-			center.x - width / 2f + x +0.5f,
-			center.y - height / 2f + y + 0.5f,
-			center.z
-			);
-	}
+		var steps = new List<ICreationPipelineStep>();
+		steps.Add(new CreateSlotsStep());
+		steps.Add(new CreateChipsStep(ChipPrefabs, Center.position));
 
-	public static void CreateSlots(LevelDescription levelDescription, EntityManager entityManager,GameObject[] tilePrefabs, Transform center)
-	{
-		var slotArchitype = entityManager.CreateArchetype(typeof(SlotPosition), typeof(SlotData));
-
-		for (int x = 0; x < levelDescription.Width; x++)
+		foreach (var creationPipelineStep in steps)
 		{
-			for (int y = 0; y < levelDescription.Height; y++)
-			{
-				var entity = entityManager.CreateEntity(slotArchitype);
-				entityManager.SetComponentData(entity, new SlotPosition() {Value = new int2(x, y)});
-				var id = y * levelDescription.Width + x;
-				entityManager.SetComponentData(entity, new SlotData() {Id = id});
-
-				var tile = entityManager.Instantiate(tilePrefabs[Random.Range(0, tilePrefabs.Length)]);
-				entityManager.SetComponentData(tile, new SlotData() {Id = id});
-				entityManager.SetComponentData(tile, new Position()
-				{
-					Value = GetPosition(x, y, levelDescription.Width, levelDescription.Height, center.position)
-				});
-			}
+			creationPipelineStep.Apply(LevelDescription, _entityManager);
 		}
 	}
 
-	public long GetIndex(Vector3 worldPosition)
+	public int2 GetIndex(Vector3 worldPosition)
 	{
 		var localPoint = worldPosition - Center.transform.position;
 		localPoint.x = localPoint.x + Level.Value.Width / 2f ;
 		localPoint.y = localPoint.y + Level.Value.Height / 2f ;
 
-		return Mathf.FloorToInt(localPoint.y) * Level.Value.Width + Mathf.FloorToInt(localPoint.x);
+		return new int2(Mathf.FloorToInt(localPoint.x), Mathf.FloorToInt(localPoint.y));
 	}
+
 }
