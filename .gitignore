@@ -13,3 +13,5 @@
 *.CSharp.Plugins.csproj
 *.csproj
 /ChinesePokerTower.sln.DotSettings
+/.idea/
+/obj/
