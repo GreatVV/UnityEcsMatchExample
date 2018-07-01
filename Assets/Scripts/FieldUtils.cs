@@ -113,7 +113,6 @@ public static class FieldUtils
                     Value = entityManager.GetComponentData<Position>(slot).Value
                 }
             );
-            entityManager.SetComponentData(chip, new AnimationTime());
         }
         else
         {
@@ -122,7 +121,6 @@ public static class FieldUtils
                     Value = entityManager.GetComponentData<Position>(slot).Value
                 }
             );
-            entityManager.AddComponentData(chip, new AnimationTime());
         }
     }
 }

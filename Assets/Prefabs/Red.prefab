@@ -26,6 +26,7 @@ GameObject:
   - component: {fileID: 114492586250366752}
   - component: {fileID: 114324066567693026}
   - component: {fileID: 114922834152261538}
+  - component: {fileID: 114875856032893288}
   m_Layer: 0
   m_Name: Red
   m_TagString: Untagged
@@ -125,6 +126,19 @@ MonoBehaviour:
     subMesh: 0
     castShadows: 0
     receiveShadows: 0
+--- !u!114 &114875856032893288
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1219843458476692}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 418216dfd8ec49659e7af04269f8cdaf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SerializedData:
+    Value: 3
 --- !u!114 &114922834152261538
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -136,5 +150,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 59ff420189054efa99cdac79608ae285, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_SerializedData:
-    Id: 0

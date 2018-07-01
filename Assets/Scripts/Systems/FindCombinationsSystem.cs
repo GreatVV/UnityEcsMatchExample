@@ -32,9 +32,16 @@ public class FindCombinationsSystem : ComponentSystem
         public EntityArray Entities;
     }
 
+    public struct MovingChips
+    {
+        public int Length;
+        public ComponentDataArray<TargetPosition> TargetPosition;
+    }
+
     [Inject] private SwapFinishedData _swaps;
     [Inject] private AllSlots _allSlots;
     [Inject] private AnalyzeFieldFlag _analyzeFieldFlag;
+    [Inject] private MovingChips _movingChips;
 
     private Dictionary<int2, Entity> _slotCache;
 
@@ -45,7 +52,7 @@ public class FindCombinationsSystem : ComponentSystem
 
     protected override void OnUpdate()
     {
-        if (_analyzeFieldFlag.Length == 0)
+        if (_analyzeFieldFlag.Length == 0 || _movingChips.Length > 0)
         {
             return;
         }
@@ -68,11 +75,11 @@ public class FindCombinationsSystem : ComponentSystem
             if (solution.Length >= 3)
             {
                 anyCombination = true;
-                Debug.Log("Combinations");
-                for (int j = 0; j < solution.Length; j++)
-                {
-                    Debug.Log(EntityManager.GetComponentData<SlotPosition>(solution[j]).Value);
-                }
+//                Debug.Log("Combinations");
+//                for (int j = 0; j < solution.Length; j++)
+//                {
+//                    Debug.Log(EntityManager.GetComponentData<SlotPosition>(solution[j]).Value);
+//                }
 
                 for (int j = solution.Length - 1; j >= 0; j--)
                 {
@@ -81,6 +88,7 @@ public class FindCombinationsSystem : ComponentSystem
                     PostUpdateCommands.DestroyEntity(chip);
                     PostUpdateCommands.RemoveComponent<ChipReference>(slot);
                 }
+
             }
 
             solution.Dispose();

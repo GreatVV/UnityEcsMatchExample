@@ -35,7 +35,7 @@ public class FallSystem : ComponentSystem
 
     protected override void OnUpdate()
     {
-        if (_analyzeFieldFlag.Length == 0 && _swap.Length > 0)
+        if (_analyzeFieldFlag.Length == 0)
         {
             return;
         }
@@ -87,7 +87,6 @@ public class FallSystem : ComponentSystem
             {
                 PostUpdateCommands.AddComponent(chip,
                     new TargetPosition(EntityManager.GetComponentData<Position>(slot).Value));
-                PostUpdateCommands.AddComponent(chip, new AnimationTime());
             }
         }
     }

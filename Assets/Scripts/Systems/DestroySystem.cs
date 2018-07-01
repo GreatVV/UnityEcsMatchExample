@@ -4,7 +4,7 @@ using Unity.Entities;
 
 public class DestroySystem : ComponentSystem
 {
-    public struct SwapFinishedData
+    public struct DestroyTarget
     {
         public int Length;
         public EntityArray Entities;
@@ -12,7 +12,7 @@ public class DestroySystem : ComponentSystem
         public ComponentDataArray<DestroyData> Destroy;
     }
 
-    [Inject] private SwapFinishedData _destroyTargets;
+    [Inject] private DestroyTarget _destroyTargets;
 
     protected override void OnUpdate()
     {

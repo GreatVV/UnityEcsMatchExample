@@ -26,6 +26,7 @@ GameObject:
   - component: {fileID: 114507300178585422}
   - component: {fileID: 114485434870818824}
   - component: {fileID: 114756353920554056}
+  - component: {fileID: 114671042532323956}
   m_Layer: 0
   m_Name: Green
   m_TagString: Untagged
@@ -98,6 +99,19 @@ MonoBehaviour:
     subMesh: 0
     castShadows: 0
     receiveShadows: 0
+--- !u!114 &114671042532323956
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1491569639190800}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 418216dfd8ec49659e7af04269f8cdaf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SerializedData:
+    Value: 3
 --- !u!114 &114756353920554056
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -109,8 +123,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 59ff420189054efa99cdac79608ae285, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_SerializedData:
-    Id: 0
 --- !u!114 &114824079870027528
 MonoBehaviour:
   m_ObjectHideFlags: 1

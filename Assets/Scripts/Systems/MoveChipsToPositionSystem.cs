@@ -1,4 +1,5 @@
-﻿using Unity.Collections;
+﻿using System.Runtime.Serialization.Formatters;
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
@@ -13,51 +14,44 @@ public class MoveChipsToPositionSystem : ComponentSystem
         [ReadOnly]
         public ComponentDataArray<TargetPosition> TargetPosition;
         public ComponentDataArray<Position> CurrentPosition;
-        public ComponentDataArray<AnimationTime> AnimationTime;
+        public ComponentDataArray<ChipSpeed> ChipSpeed;
     }
 
     [Inject] private MovingChips _movingChips;
-    private float _animationTime;
-
-    public void Setup(float animationTime)
-    {
-        _animationTime = animationTime;
-    }
 
     protected override void OnUpdate()
     {
         var dt = Time.deltaTime;
-        bool anyCompleted = false;
+
         for (int i = 0; i < _movingChips.Length; i++)
         {
             var target = _movingChips.TargetPosition[i];
             var current = _movingChips.CurrentPosition[i];
-            if (math.abs(target.Value.x - current.Value.x) < 0.01f && math.abs(target.Value.y - current.Value.y) < 0.01f)
+            var direction = target.Value - current.Value;
+            var e = _movingChips.Entities[i];
+            if (math.lengthSquared(direction) < 0.0001f || (EntityManager.HasComponent<OriginalDirection>(e) && math.dot(EntityManager.GetComponentData<OriginalDirection>(e).Value, math.normalize(direction) ) <= 0))
             {
                 current.Value = target.Value;
-
-                var movingTilesEntity = _movingChips.Entities[i];
-                PostUpdateCommands.RemoveComponent<TargetPosition>(movingTilesEntity);
-                PostUpdateCommands.RemoveComponent<AnimationTime>(movingTilesEntity);
-                anyCompleted = true;
-
+                PostUpdateCommands.RemoveComponent<TargetPosition>(e);
+                if (EntityManager.HasComponent<OriginalDirection>(e))
+                {
+                    PostUpdateCommands.RemoveComponent<OriginalDirection>(e);
+                }
             }
             else
             {
-                var animationTimeComponent = _movingChips.AnimationTime[i];
-                var animationTime = math.clamp(animationTimeComponent.Value / _animationTime, 0, 1);
-                current.Value = math.lerp(current.Value, target.Value, animationTime);
-                animationTimeComponent.Value += dt;
-                _movingChips.AnimationTime[i] = animationTimeComponent;
+                if (!EntityManager.HasComponent<OriginalDirection>(e))
+                {
+                    PostUpdateCommands.AddComponent(e, new OriginalDirection()
+                    {
+                        Value = math.normalize(direction)
+                    });
+                }
+
+                current.Value += math.normalize(direction) * _movingChips.ChipSpeed[i].Value * dt;
             }
 
             _movingChips.CurrentPosition[i] = current;
-        }
-
-        if (anyCompleted)
-        {
-            PostUpdateCommands.CreateEntity();
-            PostUpdateCommands.AddComponent(new AnalyzeField());
         }
     }
 }

@@ -45,10 +45,7 @@ public class SwapChipsSystem : ComponentSystem
             var position2 = _selectedChips.Position[1].Value;
 
             PostUpdateCommands.AddComponent(firstChip, new TargetPosition(position2));
-            PostUpdateCommands.AddComponent(firstChip, new AnimationTime());
-
             PostUpdateCommands.AddComponent(secondChip, new TargetPosition(position1));
-            PostUpdateCommands.AddComponent(secondChip, new AnimationTime());
         }
 
         if (_selectedChips.Length >= 2)

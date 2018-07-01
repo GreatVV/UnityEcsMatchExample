@@ -2,7 +2,7 @@
 using Unity.Entities;
 
 [Serializable]
-public struct AnimationTime : IComponentData
+public struct ChipSpeed : IComponentData
 {
     public float Value;
 }

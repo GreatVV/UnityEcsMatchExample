@@ -26,6 +26,7 @@ GameObject:
   - component: {fileID: 114294013320222492}
   - component: {fileID: 114659681795793744}
   - component: {fileID: 114649395990264590}
+  - component: {fileID: 114702738808470132}
   m_Layer: 0
   m_Name: Blue
   m_TagString: Untagged
@@ -81,8 +82,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 59ff420189054efa99cdac79608ae285, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_SerializedData:
-    Id: 0
 --- !u!114 &114659681795793744
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -111,6 +110,19 @@ MonoBehaviour:
     subMesh: 0
     castShadows: 0
     receiveShadows: 0
+--- !u!114 &114702738808470132
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1521370795991602}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 418216dfd8ec49659e7af04269f8cdaf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SerializedData:
+    Value: 3
 --- !u!114 &114874440969519466
 MonoBehaviour:
   m_ObjectHideFlags: 1

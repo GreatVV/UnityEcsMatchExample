@@ -26,6 +26,7 @@ GameObject:
   - component: {fileID: 114621022106893618}
   - component: {fileID: 114757014796707812}
   - component: {fileID: 114289784095318604}
+  - component: {fileID: 114735517116309090}
   m_Layer: 0
   m_Name: Purple
   m_TagString: Untagged
@@ -90,8 +91,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 59ff420189054efa99cdac79608ae285, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_SerializedData:
-    Id: 0
 --- !u!114 &114387656796937606
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -116,6 +115,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_SerializedData:
     Color: 2
+--- !u!114 &114735517116309090
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1441092766763470}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 418216dfd8ec49659e7af04269f8cdaf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SerializedData:
+    Value: 3
 --- !u!114 &114757014796707812
 MonoBehaviour:
   m_ObjectHideFlags: 1

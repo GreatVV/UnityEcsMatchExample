@@ -27,12 +27,10 @@ public class CancelSwapSystem : ComponentSystem
                 PostUpdateCommands.SetComponent(playerSwap.First, new SlotReference(slot2));
                 PostUpdateCommands.SetComponent(slot1, new ChipReference(playerSwap.Second));
                 PostUpdateCommands.AddComponent(playerSwap.First, new TargetPosition(EntityManager.GetComponentData<Position>(slot2).Value));
-                PostUpdateCommands.AddComponent(playerSwap.First, new AnimationTime());
 
                 PostUpdateCommands.SetComponent(playerSwap.Second, new SlotReference(slot1));
                 PostUpdateCommands.SetComponent(slot2, new ChipReference(playerSwap.First));
                 PostUpdateCommands.AddComponent(playerSwap.Second, new TargetPosition(EntityManager.GetComponentData<Position>(slot1).Value));
-                PostUpdateCommands.AddComponent(playerSwap.Second, new AnimationTime());
             }
             PostUpdateCommands.AddComponent(_swaps.Entities[i], new DestroyData());
         }

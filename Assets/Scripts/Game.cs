@@ -15,7 +15,6 @@ public class Game : MonoBehaviour
 	private EntityManager _entityManager;
 
 	public LevelDescription LevelDescription { get; set; }
-	private float AnimationTime = 0.5f;
 
 	public readonly Dictionary<int2, Entity> SlotCache = new Dictionary<int2, Entity>();
 
@@ -25,7 +24,6 @@ public class Game : MonoBehaviour
 		_entityManager = World.Active.GetOrCreateManager<EntityManager>();
 		ProcessLevelDescription();
 		World.Active.GetOrCreateManager<UserControlSystem>().Setup(this);
-		World.Active.GetOrCreateManager<MoveChipsToPositionSystem>().Setup(AnimationTime);
 		World.Active.GetOrCreateManager<FindCombinationsSystem>().Setup(SlotCache);
 		World.Active.GetOrCreateManager<GeneratorSystem>().Setup(ChipPrefabs, SlotCache, LevelDescription);
 		World.Active.GetOrCreateManager<FallSystem>().Setup(SlotCache, LevelDescription);

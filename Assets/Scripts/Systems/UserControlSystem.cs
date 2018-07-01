@@ -75,7 +75,6 @@ public class UserControlSystem : ComponentSystem
 
                     if (FieldUtils.NextToEachOther(previousSelectedPosition.Value, position))
                     {
-
                         PostUpdateCommands.AddComponent(chip, new Selected()
                         {
                             Number = 2
