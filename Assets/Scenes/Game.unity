@@ -310,9 +310,9 @@ MonoBehaviour:
   ScoreLabel: {fileID: 1073251764}
   GameOverScreen: {fileID: 796630383}
   DeathPosition: {fileID: 1974906822}
-  SelectionPrefab: {fileID: 1482048932772814, guid: ec0cd7eb908c5434da16f213af0a638e,
+  SelectionPrefab: {fileID: 1063012804843974, guid: 42f08ced82fce2e4a815f8cdcd0a7655,
     type: 2}
-  ExplosionPrefab: {fileID: 1063012804843974, guid: 42f08ced82fce2e4a815f8cdcd0a7655,
+  ExplosionPrefab: {fileID: 1482048932772814, guid: ec0cd7eb908c5434da16f213af0a638e,
     type: 2}
   Speed: 20
   Acceleration: 10
