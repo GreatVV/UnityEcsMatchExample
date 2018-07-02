@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Name: Level1
   m_EditorClassIdentifier: 
   Value:
-    Width: 200
-    Height: 200
+    Width: 8
+    Height: 8
     ColorCount: 5
     Time: 60
     SlotDescriptions:

@@ -18,14 +18,7 @@ public class FallSystem : ComponentSystem
         [ReadOnly] public ComponentDataArray<AnalyzeField> AnalyzeField;
     }
 
-    public struct Swap
-    {
-        public int Length;
-        [ReadOnly] public ComponentDataArray<PlayerSwap> PlayerSwap;
-    }
-
     [Inject] private AnalyzeFieldFlag _analyzeFieldFlag;
-    [Inject] private Swap _swap;
 
     public void Setup(Dictionary<int2, Entity> slotCache, LevelDescription levelDescription)
     {
