@@ -2,7 +2,7 @@
 using Unity.Entities;
 
 [Serializable]
-public struct DestroyData : IComponentData
+public struct Dying : IComponentData
 {
-
+    
 }

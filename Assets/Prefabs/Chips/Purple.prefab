@@ -27,6 +27,7 @@ GameObject:
   - component: {fileID: 114757014796707812}
   - component: {fileID: 114289784095318604}
   - component: {fileID: 114735517116309090}
+  - component: {fileID: 114021724826745736}
   m_Layer: 0
   m_Name: Purple
   m_TagString: Untagged
@@ -47,6 +48,19 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &114021724826745736
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1441092766763470}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3e34d50e67e64bfba45a3794b2be6a5c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SerializedData:
+    Value: 2
 --- !u!114 &114084674418021992
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -127,7 +141,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_SerializedData:
-    Value: 3
+    Value: 6
 --- !u!114 &114757014796707812
 MonoBehaviour:
   m_ObjectHideFlags: 1

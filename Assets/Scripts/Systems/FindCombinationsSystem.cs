@@ -29,22 +29,37 @@ public class FindCombinationsSystem : ComponentSystem
     {
         public int Length;
         public ComponentDataArray<AnalyzeField> AnalyzeField;
+        public SubtractiveComponent<DestroyMarker> Destroy;
         public EntityArray Entities;
+    }
+
+    public struct MovingChips
+    {
+        public int Length;
+        public ComponentDataArray<TargetPosition> TargetPositions;
     }
 
     [Inject] private SwapFinishedData _swaps;
     [Inject] private AllSlots _allSlots;
     [Inject] private AnalyzeFieldFlag _analyzeFieldFlag;
+    [Inject] private MovingChips _movingChips;
 
     private Dictionary<int2, Entity> _slotCache;
+    private LevelDescription _levelDescription;
 
-    public void Setup(Dictionary<int2, Entity> slotCache)
+    public void Setup(Dictionary<int2, Entity> slotCache, LevelDescription levelDescription)
     {
         _slotCache = slotCache;
+        _levelDescription = levelDescription;
     }
 
     protected override void OnUpdate()
     {
+        if (_movingChips.Length > 0)
+        {
+            return;
+        }
+
         if (_analyzeFieldFlag.Length == 0)
         {
             return;
@@ -52,7 +67,7 @@ public class FindCombinationsSystem : ComponentSystem
 
         for (int i = 0; i < _analyzeFieldFlag.Length; i++)
         {
-            PostUpdateCommands.AddComponent(_analyzeFieldFlag.Entities[i], new DestroyData());
+            PostUpdateCommands.AddComponent(_analyzeFieldFlag.Entities[i], new DestroyMarker());
         }
 
         var visited = new NativeHashMap<int2, bool>(_slotCache.Count, Allocator.Temp);
@@ -67,21 +82,24 @@ public class FindCombinationsSystem : ComponentSystem
 
             if (solution.Length >= 3)
             {
-                anyCombination = true;
+                if (IsCorrectCombination(EntityManager, solution, _levelDescription.Width, _levelDescription.Height))
+                {
+                    anyCombination = true;
+
 //                Debug.Log("Combinations");
 //                for (int j = 0; j < solution.Length; j++)
 //                {
 //                    Debug.Log(EntityManager.GetComponentData<SlotPosition>(solution[j]).Value);
 //                }
 
-                for (int j = solution.Length - 1; j >= 0; j--)
-                {
-                    var slot = solution[j];
-                    var chip = EntityManager.GetComponentData<ChipReference>(slot).Value;
-                    PostUpdateCommands.DestroyEntity(chip);
-                    PostUpdateCommands.RemoveComponent<ChipReference>(slot);
+                    for (int j = solution.Length - 1; j >= 0; j--)
+                    {
+                        var slot = solution[j];
+                        var chip = EntityManager.GetComponentData<ChipReference>(slot).Value;
+                        PostUpdateCommands.AddComponent(chip, new Dying());
+                        PostUpdateCommands.RemoveComponent<ChipReference>(slot);
+                    }
                 }
-
             }
 
             solution.Dispose();
@@ -178,5 +196,43 @@ public class FindCombinationsSystem : ComponentSystem
         {
             Visit(entityManager, targetSlotPosition, ref visited, positions, ref solution);
         }
+    }
+
+    public static bool IsCorrectCombination(EntityManager entityManager, NativeList<Entity> combinationList, int width, int height)
+    {
+        var yAmount = new NativeArray<int>(height, Allocator.Temp);
+        var xAmount = new NativeArray<int>(width, Allocator.Temp);
+
+        for (int i = 0; i < combinationList.Length; i++)
+        {
+            var slot = combinationList[i];
+            var position = entityManager.GetComponentData<SlotPosition>(slot).Value;
+            xAmount[position.x]++;
+            yAmount[position.y]++;
+        }
+
+        var isCombination = false;
+        for (int i = 0; i < yAmount.Length; i++)
+        {
+            if (yAmount[i] >= 3)
+            {
+                isCombination = true;
+                break;
+            }
+        }
+
+        for (int j = 0; j < xAmount.Length; j++)
+        {
+            if (xAmount[j] >= 3)
+            {
+                isCombination = true;
+                break;
+            }
+        }
+
+        yAmount.Dispose();
+        xAmount.Dispose();
+
+        return isCombination;
     }
 }

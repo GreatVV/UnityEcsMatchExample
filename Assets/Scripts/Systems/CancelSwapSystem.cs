@@ -26,13 +26,31 @@ public class CancelSwapSystem : ComponentSystem
 
                 PostUpdateCommands.SetComponent(playerSwap.First, new SlotReference(slot2));
                 PostUpdateCommands.SetComponent(slot1, new ChipReference(playerSwap.Second));
-                PostUpdateCommands.AddComponent(playerSwap.First, new TargetPosition(EntityManager.GetComponentData<Position>(slot2).Value));
+                if (!EntityManager.HasComponent<TargetPosition>(playerSwap.First))
+                {
+                    PostUpdateCommands.AddComponent(playerSwap.First,
+                        new TargetPosition(EntityManager.GetComponentData<Position>(slot2).Value));
+                }
+                else
+                {
+                    PostUpdateCommands.SetComponent(playerSwap.First,
+                        new TargetPosition(EntityManager.GetComponentData<Position>(slot2).Value));
+                }
 
                 PostUpdateCommands.SetComponent(playerSwap.Second, new SlotReference(slot1));
                 PostUpdateCommands.SetComponent(slot2, new ChipReference(playerSwap.First));
-                PostUpdateCommands.AddComponent(playerSwap.Second, new TargetPosition(EntityManager.GetComponentData<Position>(slot1).Value));
+                if (!EntityManager.HasComponent<TargetPosition>(playerSwap.Second))
+                {
+                    PostUpdateCommands.AddComponent(playerSwap.Second,
+                        new TargetPosition(EntityManager.GetComponentData<Position>(slot1).Value));
+                }
+                else
+                {
+                    PostUpdateCommands.SetComponent(playerSwap.Second,
+                        new TargetPosition(EntityManager.GetComponentData<Position>(slot1).Value));
+                }
             }
-            PostUpdateCommands.AddComponent(_swaps.Entities[i], new DestroyData());
+            PostUpdateCommands.AddComponent(_swaps.Entities[i], new DestroyMarker());
         }
     }
 }

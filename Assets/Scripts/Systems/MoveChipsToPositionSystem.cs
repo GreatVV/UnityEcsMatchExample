@@ -15,6 +15,8 @@ public class MoveChipsToPositionSystem : ComponentSystem
         public ComponentDataArray<TargetPosition> TargetPosition;
         public ComponentDataArray<Position> CurrentPosition;
         public ComponentDataArray<ChipSpeed> ChipSpeed;
+        public ComponentDataArray<ChipAcceleration> ChipAcceleration;
+        public SubtractiveComponent<DestroyMarker> Destroy;
     }
 
     [Inject] private MovingChips _movingChips;
@@ -37,6 +39,11 @@ public class MoveChipsToPositionSystem : ComponentSystem
                 {
                     PostUpdateCommands.RemoveComponent<OriginalDirection>(e);
                 }
+
+                if (EntityManager.HasComponent<Dying>(e))
+                {
+                    PostUpdateCommands.AddComponent(e, new DestroyMarker());
+                }
             }
             else
             {
@@ -48,7 +55,11 @@ public class MoveChipsToPositionSystem : ComponentSystem
                     });
                 }
 
-                current.Value += math.normalize(direction) * _movingChips.ChipSpeed[i].Value * dt;
+                var chipSpeed = _movingChips.ChipSpeed[i];
+                current.Value += math.normalize(direction) * chipSpeed.Value * dt;
+                chipSpeed.Value += _movingChips.ChipAcceleration[i].Value * dt;
+                _movingChips.ChipSpeed[i] = chipSpeed;
+
             }
 
             _movingChips.CurrentPosition[i] = current;

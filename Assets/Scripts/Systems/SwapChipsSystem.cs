@@ -13,6 +13,7 @@ public class SwapChipsSystem : ComponentSystem
         [ReadOnly]
         public ComponentDataArray<Position> Position;
         public ComponentDataArray<SlotReference> SlotReference;
+        public SubtractiveComponent<TargetPosition> TargetPosition;
     }
 
     [Inject] private SelectedChips _selectedChips;
@@ -21,15 +22,16 @@ public class SwapChipsSystem : ComponentSystem
     {
         if (_selectedChips.Length == 2)
         {
-            PostUpdateCommands.CreateEntity();
             var firstChip = _selectedChips.Entities[0];
             var secondChip = _selectedChips.Entities[1];
 
+            PostUpdateCommands.CreateEntity();
             PostUpdateCommands.AddComponent(
-                new PlayerSwap() {
-                First = firstChip,
-                Second = secondChip
-                    });
+                new PlayerSwap()
+                {
+                    First = firstChip,
+                    Second = secondChip
+                });
 
             var tempSlotReference = _selectedChips.SlotReference[0];
             _selectedChips.SlotReference[0] = _selectedChips.SlotReference[1];
@@ -43,6 +45,7 @@ public class SwapChipsSystem : ComponentSystem
 
             var position1 = _selectedChips.Position[0].Value;
             var position2 = _selectedChips.Position[1].Value;
+
 
             PostUpdateCommands.AddComponent(firstChip, new TargetPosition(position2));
             PostUpdateCommands.AddComponent(secondChip, new TargetPosition(position1));

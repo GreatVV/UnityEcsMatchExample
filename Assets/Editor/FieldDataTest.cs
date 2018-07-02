@@ -189,6 +189,8 @@ public class FieldDataTest : BaseWorldTests
         FindCombinationsSystem.Find(entityManager,slotCache,  new int2(0,2), ref visited, ref combinationList);
         Assert.AreEqual(3, combinationList.Length);
 
+        Assert.IsTrue(FindCombinationsSystem.IsCorrectCombination(entityManager, combinationList, levelDescription.Width, levelDescription.Height));
+
 
         combinationList.Dispose();
     }
@@ -286,6 +288,94 @@ public class FieldDataTest : BaseWorldTests
         combinationList.Clear();
         FindCombinationsSystem.Find(entityManager, slotCache,new int2(0,2),ref visited,  ref combinationList);
         Assert.AreEqual(9, combinationList.Length);
+
+        visited.Dispose();
+        combinationList.Dispose();
+    }
+
+    [Test]
+    public void CreateChipsAndFindThreeGroupButNoCombinations()
+    {
+        var entityManager = World.Active.GetOrCreateManager<EntityManager>();
+
+        var levelDescription = new LevelDescription()
+        {
+            Width = 3,
+            Height = 3,
+            SlotChipDescriptions = new List<SlotChipDescription>()
+            {
+                new SlotChipDescription()
+                {
+                    Position = new int2(0,0),
+                    Color = ChipColor.Red,
+                },
+                new SlotChipDescription()
+                {
+                    Position = new int2(1,0),
+                    Color = ChipColor.Red,
+                },
+                new SlotChipDescription()
+                {
+                    Position = new int2(2,0),
+                    Color = ChipColor.Blue,
+                },
+
+                new SlotChipDescription()
+                {
+                    Position = new int2(0,1),
+                    Color = ChipColor.Blue,
+                },
+                new SlotChipDescription()
+                {
+                    Position = new int2(1,1),
+                    Color = ChipColor.Red,
+                },
+                new SlotChipDescription()
+                {
+                    Position = new int2(2,1),
+                    Color = ChipColor.Blue,
+                },
+
+                new SlotChipDescription()
+                {
+                    Position = new int2(0,2),
+                    Color = ChipColor.Yellow,
+                },
+                new SlotChipDescription()
+                {
+                    Position = new int2(1,2),
+                    Color = ChipColor.Yellow,
+                },
+                new SlotChipDescription()
+                {
+                    Position = new int2(2,2),
+                    Color = ChipColor.Yellow,
+                },
+
+            }
+        };
+
+        var slotCache = new Dictionary<int2, Entity>();
+        var createSlots = new CreateSlotsStep(slotCache, Vector3.zero);
+        createSlots.Apply(levelDescription, entityManager);
+
+
+        var createChips = new CreateChipsStep(new[]
+        {
+            CreateChipPrefab(0),
+            CreateChipPrefab((ChipColor) 1),
+            CreateChipPrefab((ChipColor)2),
+            CreateChipPrefab((ChipColor)3),
+            CreateChipPrefab((ChipColor)4),
+        });
+        createChips.Apply(levelDescription, entityManager);
+
+        var combinationList = new NativeList<Entity>(64, Allocator.Temp);
+        var visited = new NativeHashMap<int2, bool>(64, Allocator.Temp);
+
+        FindCombinationsSystem.Find(entityManager, slotCache, new int2(0,0), ref visited, ref combinationList);
+        Assert.AreEqual(3, combinationList.Length);
+        Assert.IsFalse(FindCombinationsSystem.IsCorrectCombination(entityManager, combinationList, levelDescription.Width, levelDescription.Height));
 
         visited.Dispose();
         combinationList.Dispose();

@@ -1,7 +1,9 @@
 ﻿using Unity.Collections;
 using Unity.Entities;
+using UnityEngine.Experimental.PlayerLoop;
 
 
+[UpdateAfter(typeof(PostLateUpdate))]
 public class DestroySystem : ComponentSystem
 {
     public struct DestroyTarget
@@ -9,7 +11,7 @@ public class DestroySystem : ComponentSystem
         public int Length;
         public EntityArray Entities;
         [ReadOnly]
-        public ComponentDataArray<DestroyData> Destroy;
+        public ComponentDataArray<DestroyMarker> Destroy;
     }
 
     [Inject] private DestroyTarget _destroyTargets;
