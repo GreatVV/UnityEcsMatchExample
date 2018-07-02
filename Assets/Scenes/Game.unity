@@ -196,7 +196,7 @@ MonoBehaviour:
   m_outlineColor:
     serializedVersion: 2
     rgba: 4278190080
-  m_fontSize: 39.1
+  m_fontSize: 66.2
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -310,10 +310,12 @@ MonoBehaviour:
   ScoreLabel: {fileID: 1073251764}
   GameOverScreen: {fileID: 796630383}
   DeathPosition: {fileID: 1974906822}
-  SelectionPrefab: {fileID: 1063012804843974, guid: 42f08ced82fce2e4a815f8cdcd0a7655,
+  SelectionPrefab: {fileID: 1482048932772814, guid: ec0cd7eb908c5434da16f213af0a638e,
     type: 2}
-  ExplosionPrefab: {fileID: 1482048932772814, guid: ec0cd7eb908c5434da16f213af0a638e,
+  ExplosionPrefab: {fileID: 1063012804843974, guid: 42f08ced82fce2e4a815f8cdcd0a7655,
     type: 2}
+  Speed: 20
+  Acceleration: 10
 --- !u!4 &490150922
 Transform:
   m_ObjectHideFlags: 0
@@ -867,7 +869,7 @@ MonoBehaviour:
     spaceCount: 1
     wordCount: 2
     linkCount: 0
-    lineCount: 2
+    lineCount: 1
     pageCount: 1
     materialCount: 1
   m_havePropertiesChanged: 0
@@ -1394,7 +1396,7 @@ GameObject:
   m_Layer: 0
   m_Name: DeathPosition
   m_TagString: Untagged
-  m_Icon: {fileID: 7148428337604731935, guid: 0000000000000000d000000000000000, type: 0}
+  m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1

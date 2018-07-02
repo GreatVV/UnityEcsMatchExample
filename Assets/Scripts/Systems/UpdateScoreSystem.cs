@@ -7,6 +7,7 @@ public class UpdateScoreSystem : ComponentSystem
         public int Length;
         public ComponentDataArray<Dying> Dying;
         public ComponentDataArray<DestroyMarker> Destroy;
+        public EntityArray EntityArray;
     }
 
     public struct ScoreScore

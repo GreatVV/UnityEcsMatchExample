@@ -29,9 +29,16 @@ public class UserControlSystem : ComponentSystem
         public SubtractiveComponent<Dying> Dying;
     }
 
+    public struct TimeUp
+    {
+        public int Length;
+        [ReadOnly] public ComponentDataArray<TimeOver> _;
+    }
+
     [Inject] private SelectedTilesData _selected;
     [Inject] private MovingChips _movingChips;
     [Inject] private Chips _chips;
+    [Inject] private TimeUp _timeUp;
     private Game _game;
 
     public void Setup(Game game)
@@ -47,6 +54,11 @@ public class UserControlSystem : ComponentSystem
 
     protected override void OnUpdate()
     {
+        if (_timeUp.Length > 0)
+        {
+            return;
+        }
+
         if (Input.GetMouseButtonDown(0))
         {
             _startTouchPosition = Input.mousePosition;

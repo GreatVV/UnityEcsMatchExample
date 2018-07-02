@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Security.Policy;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
@@ -6,21 +7,11 @@ using Unity.Transforms;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-public class PlayExplosionOnChipsDestroy : ComponentSystem
+public class PlayExplosionOnChipsDestroySystem : ComponentSystem
 {
-    public struct DestroyChip
-    {
-        public int Length;
-        [ReadOnly]
-        public ComponentDataArray<Chip> Chip;
-        [ReadOnly]
-        public ComponentDataArray<DestroyMarker> _;
-        [ReadOnly]
-        public ComponentDataArray<Position> Positions;
-    }
-
-    [Inject] private DestroyChip _deadChips;
+    [Inject] private UpdateScoreSystem.DyingDeadChips _deadChips;
     [Inject] private SyncScoreSystem.ScoreScore _score;
+
     private GameObject _explosion;
 
     public void Setup(GameObject explosion)
@@ -32,7 +23,9 @@ public class PlayExplosionOnChipsDestroy : ComponentSystem
     {
         if (_deadChips.Length > 0)
         {
-            var position = _deadChips.Positions[0].Value;
+            Debug.Log("Play");
+            var entity = _deadChips.EntityArray[0];
+            var position = EntityManager.GetComponentData<Position>(entity).Value;
             Object.Instantiate(_explosion, position, Quaternion.identity);
         }
     }

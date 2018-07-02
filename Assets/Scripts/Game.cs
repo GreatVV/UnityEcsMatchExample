@@ -43,7 +43,7 @@ public class Game : MonoBehaviour
 		World.Active.GetOrCreateManager<MoveDeadChipsToScore>().Setup(DeathPosition.position, Speed, Acceleration);
 		World.Active.GetOrCreateManager<ShowSelectionSystem>().Setup(SelectionPrefab);
 		World.Active.GetOrCreateManager<SyncScoreSystem>().Setup(ScoreLabel);
-		World.Active.GetOrCreateManager<PlayExplosionOnChipsDestroy>().Setup(ExplosionPrefab);
+		World.Active.GetOrCreateManager<PlayExplosionOnChipsDestroySystem>().Setup(ExplosionPrefab);
 
 		_entityManager.CreateEntity(typeof(AnalyzeField));
 
