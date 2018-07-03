@@ -5,22 +5,8 @@ namespace UndergroundMatch3.Systems
 {
     public class UpdateScoreSystem : ComponentSystem
     {
-        public struct DyingDeadChips
-        {
-            public int Length;
-            public ComponentDataArray<Dying> Dying;
-            public ComponentDataArray<DestroyMarker> Destroy;
-            public EntityArray EntityArray;
-        }
-
-        public struct ScoreScore
-        {
-            public int Length;
-            public ComponentDataArray<Score> Score;
-        }
-
-        [Inject] private DyingDeadChips _deadChips;
-        [Inject] private ScoreScore _score;
+        [Inject] private SystemsUtils.DyingDeadChips _deadChips;
+        [Inject] private SystemsUtils.ScoreScore _score;
 
         protected override void OnUpdate()
         {

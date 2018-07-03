@@ -14,12 +14,7 @@ namespace UndergroundMatch3.Systems
             _scoreLabel = gameScreen.ScoreLabel;
         }
 
-        public struct ScoreScore
-        {
-            public int Length;
-            public ComponentDataArray<Score> Score;
-        }
-        [Inject] private ScoreScore _score;
+        [Inject] private SystemsUtils.ScoreScore _score;
 
         private int _prevScore = -1;
 

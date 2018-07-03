@@ -34,42 +34,37 @@ namespace UndergroundMatch3.Systems
 
         protected override void OnUpdate()
         {
-            for (int i = 0; i < _slotGenerators.Length; i++)
+            //create one chip per frame because it is stylish
+            var i = 0;
+            var colorsCount = Mathf.Min(_chipPrefabs.Length, _levelDescription.ColorCount);
+            var color = Random.Range(0, colorsCount);
+            var slot = _slotGenerators.Entities[i];
+
+            var slotPosition = _slotGenerators.Positions[i].Value;
+
+            var targetY = FallSystem.GetNextEmptyRow(EntityManager, _slotCache, slotPosition);
+            float3 position = EntityManager.GetComponentData<Position>(slot).Value;
+            if (targetY > 0)
             {
-                var colorsCount = Mathf.Min(_chipPrefabs.Length, _levelDescription.ColorCount);
-                var color = Random.Range(0, colorsCount);
-                var slot = _slotGenerators.Entities[i];
-
-                var slotPosition = _slotGenerators.Positions[i].Value;
-
-                var targetY = FallSystem.GetNextEmptyRow(EntityManager, _slotCache, slotPosition);
-                float3 position = EntityManager.GetComponentData<Position>(slot).Value;
-                if (targetY > 0)
-                {
-                    targetY-=1;
-                    var oneAbove = _slotCache[new int2(slotPosition.x,targetY)];
-                    var chipOneAbove = EntityManager.GetComponentData<ChipReference>(oneAbove).Value;
-                    position = EntityManager.GetComponentData<Position>(chipOneAbove).Value + new float3(0, 1, 0);
-                }
-
-
-
-                var chip = EntityManager.Instantiate(_chipPrefabs[color].gameObject);
-                EntityManager.AddComponentData(chip, new SlotReference()
-                {
-                    Value = slot
-                });
-                EntityManager.SetComponentData(chip, new Position()
-                {
-                    Value = position
-                });
-                EntityManager.AddComponentData(slot, new ChipReference()
-                {
-                    Value = chip
-                });
-
-                break;
+                targetY -= 1;
+                var oneAbove = _slotCache[new int2(slotPosition.x, targetY)];
+                var chipOneAbove = EntityManager.GetComponentData<ChipReference>(oneAbove).Value;
+                position = EntityManager.GetComponentData<Position>(chipOneAbove).Value + new float3(0, 1, 0);
             }
+
+            var chip = EntityManager.Instantiate(_chipPrefabs[color].gameObject);
+            EntityManager.AddComponentData(chip, new SlotReference()
+            {
+                Value = slot
+            });
+            EntityManager.SetComponentData(chip, new Position()
+            {
+                Value = position
+            });
+            EntityManager.AddComponentData(slot, new ChipReference()
+            {
+                Value = chip
+            });
 
             PostUpdateCommands.CreateEntity();
             PostUpdateCommands.AddComponent(new AnalyzeField());

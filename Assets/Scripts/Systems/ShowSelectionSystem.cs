@@ -23,14 +23,9 @@ namespace UndergroundMatch3.Systems
             public ComponentDataArray<Position> Position;
         }
 
-        public struct Moving
-        {
-            public int Length;
-            public ComponentDataArray<TargetPosition> TargetPosition;
-        }
 
         [Inject] private Selection _selection;
-        [Inject] private Moving _moving;
+        [Inject] private SystemsUtils.MovingChips _moving;
 
         protected override void OnUpdate()
         {

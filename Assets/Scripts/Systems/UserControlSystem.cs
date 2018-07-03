@@ -26,8 +26,7 @@ namespace UndergroundMatch3.Systems
         {
             public int Length;
             [ReadOnly] public ComponentDataArray<TargetPosition> TargetPosition;
-            [ReadOnly]
-            public SubtractiveComponent<Dying> Dying;
+            [ReadOnly] public SubtractiveComponent<Dying> Dying;
         }
 
         public struct TimeUp
@@ -38,9 +37,11 @@ namespace UndergroundMatch3.Systems
 
         [Inject] private SelectedTilesData _selected;
         [Inject] private MovingChips _movingChips;
-        [Inject] private Chips _chips;
         [Inject] private TimeUp _timeUp;
+        [Inject] private Chips _chips;
+
         private SceneConfiguration _sceneConfiguration;
+        private Dictionary<int2, Entity> _slotCache;
 
         public void Setup(SceneConfiguration sceneConfiguration, Dictionary<int2, Entity> slotCache)
         {
@@ -49,10 +50,7 @@ namespace UndergroundMatch3.Systems
         }
 
         private Vector3 _startTouchPosition;
-        private float _startTouchTime;
-
         private float _swapMinDistance = 0.5f;
-        private Dictionary<int2, Entity> _slotCache;
 
 
         protected override void OnUpdate()
@@ -65,7 +63,6 @@ namespace UndergroundMatch3.Systems
             if (Input.GetMouseButtonDown(0))
             {
                 _startTouchPosition = Input.mousePosition;
-                _startTouchTime = Time.realtimeSinceStartup;
             }
 
             if (Input.GetMouseButtonUp(0))
@@ -80,51 +77,44 @@ namespace UndergroundMatch3.Systems
 
                 var swapDirection = worldPosition - startWorldPosition;
 
+                var pm = PostUpdateCommands;
+                var em = EntityManager;
                 if (swapDirection.magnitude < _swapMinDistance)
                 {
                     var clickPosition = _sceneConfiguration.GetIndex(startWorldPosition);
                     if (_slotCache.ContainsKey(clickPosition))
                     {
                         var slot = _slotCache[clickPosition];
-                        var position = EntityManager.GetComponentData<SlotPosition>(slot).Value;
+                        var position = em.GetComponentData<SlotPosition>(slot).Value;
 
-                        var chip = EntityManager.GetComponentData<ChipReference>(slot).Value;
-                        if (EntityManager.HasComponent(chip, ComponentType.Create<Selected>()))
+                        var chip = em.GetComponentData<ChipReference>(slot).Value;
+                        if (em.HasComponent(chip, ComponentType.Create<Selected>()))
                         {
-                            PostUpdateCommands.RemoveComponent<Selected>(chip);
+                            pm.RemoveComponent<Selected>(chip);
                         }
                         else
                         {
                             if (_selected.Length == 0)
                             {
-                                PostUpdateCommands.AddComponent(chip, new Selected()
-                                {
-                                    Number = 1
-                                });
+                                pm.AddComponent(chip, new Selected());
                             }
                             else
                             {
                                 //check if next to previous slot;
                                 var previousSelected = _selected.Entities[0];
                                 var previousSelectedSlot =
-                                    EntityManager.GetComponentData<SlotReference>(previousSelected).Value;
+                                    em.GetComponentData<SlotReference>(previousSelected).Value;
                                 var previousSelectedPosition =
-                                    EntityManager.GetComponentData<SlotPosition>(previousSelectedSlot);
+                                    em.GetComponentData<SlotPosition>(previousSelectedSlot);
 
                                 if (FieldUtils.NextToEachOther(previousSelectedPosition.Value, position))
                                 {
-                                    PostUpdateCommands.AddComponent(chip, new Selected()
-                                    {
-                                        Number = 2
-                                    });
+                                    pm.AddComponent(chip, new Selected());
                                 }
                                 else
                                 {
-                                    PostUpdateCommands.RemoveComponent<Selected>(previousSelected);
-                                    PostUpdateCommands.AddComponent(chip, new Selected()
-                                    {
-                                        Number = 1
-                                    });
+                                    pm.RemoveComponent<Selected>(previousSelected);
+                                    pm.AddComponent(chip, new Selected());
                                 }
                             }
                         }
@@ -167,23 +157,17 @@ namespace UndergroundMatch3.Systems
                         {
                             for (int i = 0; i < _selected.Length; i++)
                             {
-                                PostUpdateCommands.RemoveComponent<Selected>(_selected.Entities[i]);
+                                pm.RemoveComponent<Selected>(_selected.Entities[i]);
                             }
 
                             var firstChip =
-                                EntityManager.GetComponentData<ChipReference>(_slotCache[clickSlotPosition]).Value;
+                                em.GetComponentData<ChipReference>(_slotCache[clickSlotPosition]).Value;
 
                             var secondChip =
-                                EntityManager.GetComponentData<ChipReference>(_slotCache[otherClickPosition]).Value;
+                                em.GetComponentData<ChipReference>(_slotCache[otherClickPosition]).Value;
 
-                            PostUpdateCommands.AddComponent(firstChip, new Selected()
-                            {
-                                Number = 1
-                            });
-                            PostUpdateCommands.AddComponent(secondChip, new Selected()
-                            {
-                                Number = 2
-                            });
+                            pm.AddComponent(firstChip, new Selected());
+                            pm.AddComponent(secondChip, new Selected());
 
                         }
                     }

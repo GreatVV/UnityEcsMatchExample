@@ -20,14 +20,6 @@ namespace UndergroundMatch3.Systems
             public ComponentDataArray<SlotPosition> Positions;
         }
 
-        public struct SwapFinishedData
-        {
-            public int Length;
-            public EntityArray Entities;
-            public ComponentDataArray<PlayerSwap> PlayerSwap;
-            public SubtractiveComponent<SwapSuccess> SwapSuccess;
-        }
-
         public struct AnalyzeFieldFlag
         {
             public int Length;
@@ -36,16 +28,10 @@ namespace UndergroundMatch3.Systems
             public EntityArray Entities;
         }
 
-        public struct MovingChips
-        {
-            public int Length;
-            public ComponentDataArray<TargetPosition> TargetPositions;
-        }
-
-        [Inject] private SwapFinishedData _swaps;
+        [Inject] private SystemsUtils.NotFinishedSwaps _notFinishedSwaps;
         [Inject] private AllSlots _allSlots;
         [Inject] private AnalyzeFieldFlag _analyzeFieldFlag;
-        [Inject] private MovingChips _movingChips;
+        [Inject] private SystemsUtils.MovingChips _movingChips;
 
         private Dictionary<int2, Entity> _slotCache;
         private LevelDescription _levelDescription;
@@ -110,9 +96,9 @@ namespace UndergroundMatch3.Systems
                 solution.Dispose();
             }
 
-            for (int i = 0; i < _swaps.Length; i++)
+            for (int i = 0; i < _notFinishedSwaps.Length; i++)
             {
-                PostUpdateCommands.AddComponent(_swaps.Entities[i], new SwapSuccess()
+                PostUpdateCommands.AddComponent(_notFinishedSwaps.Entities[i], new SwapSuccess()
                 {
                     Value = anyCombination ? SwapResult.Success : SwapResult.Fail
                 });

@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 67145a8b19c2447289fa2e1c7c334608, type: 3}
+  m_Name: Configuration
+  m_EditorClassIdentifier: 
+  ChipPrefabs:
+  - {fileID: 114874440969519466, guid: d7e6b15d4196792459c754186dec4589, type: 2}
+  - {fileID: 114037151762795016, guid: c9ae1af114a8e5f409d45c30cdf25373, type: 2}
+  - {fileID: 114814319981711528, guid: c518ff7e9521d8642aebec0b1887cae5, type: 2}
+  - {fileID: 114714653725707754, guid: 69c37fe4dbf5fa04586d5eda1217b362, type: 2}
+  - {fileID: 114009805373555198, guid: b5b6dc1828ae9004ebb7247f976f1a88, type: 2}
+  SelectionPrefab: {fileID: 1063012804843974, guid: 42f08ced82fce2e4a815f8cdcd0a7655,
+    type: 2}
+  ExplosionPrefab: {fileID: 1482048932772814, guid: ec0cd7eb908c5434da16f213af0a638e,
+    type: 2}
+  Speed: 20
+  Acceleration: 10

@@ -616,7 +616,7 @@ PlayerSettings:
   cloudServicesEnabled:
     UNet: 1
   facebookSdkVersion: 7.9.4
-  apiCompatibilityLevel: 2
+  apiCompatibilityLevel: 3
   cloudProjectId: 783f60d2-6eb1-4318-b25d-0f12383caa62
   projectName: EcsMatch3
   organizationId: greatvv

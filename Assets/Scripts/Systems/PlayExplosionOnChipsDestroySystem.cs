@@ -7,8 +7,8 @@ namespace UndergroundMatch3.Systems
 {
     public class PlayExplosionOnChipsDestroySystem : ComponentSystem
     {
-        [Inject] private UpdateScoreSystem.DyingDeadChips _deadChips;
-        [Inject] private SyncScoreSystem.ScoreScore _score;
+        [Inject] private SystemsUtils.DyingDeadChips _deadChips;
+        //[Inject] private SystemsUtils.ScoreScore _score;
 
         private GameObject _explosion;
 

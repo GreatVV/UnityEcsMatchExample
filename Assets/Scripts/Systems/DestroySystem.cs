@@ -8,21 +8,13 @@ namespace UndergroundMatch3.Systems
     [UpdateAfter(typeof(PostLateUpdate))]
     public class DestroySystem : ComponentSystem
     {
-        public struct DestroyTarget
-        {
-            public int Length;
-            public EntityArray Entities;
-            [ReadOnly]
-            public ComponentDataArray<DestroyMarker> Destroy;
-        }
-
-        [Inject] private DestroyTarget _destroyTargets;
+        [Inject] private SystemsUtils.MarkedForDestroy _markedForDestroy;
 
         protected override void OnUpdate()
         {
-            for (int i = 0; i < _destroyTargets.Length; i++)
+            for (int i = 0; i < _markedForDestroy.Length; i++)
             {
-                PostUpdateCommands.DestroyEntity(_destroyTargets.Entities[i]);
+                PostUpdateCommands.DestroyEntity(_markedForDestroy.Entities[i]);
             }
         }
     }

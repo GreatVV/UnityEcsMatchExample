@@ -51,31 +51,22 @@ namespace UndergroundMatch3
             {
                 case Neighbours.None:
                     return new int2();
-                    break;
                 case Neighbours.Top:
                     return new int2(0,1);
-                    break;
                 case Neighbours.TopRight:
                     return new int2(1,1);
-                    break;
                 case Neighbours.Right:
                     return new int2(1,0);
-                    break;
                 case Neighbours.BottomRight:
                     return new int2(1,-1);
-                    break;
                 case Neighbours.Bottom:
                     return new int2(0,-1);
-                    break;
                 case Neighbours.BottomLeft:
                     return new int2(-1,-1);
-                    break;
                 case Neighbours.Left:
                     return new int2(-1,0);
-                    break;
                 case Neighbours.TopLeft:
                     return new int2(-1,1);
-                    break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(neighbours), neighbours, null);
             }

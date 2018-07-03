@@ -5,21 +5,13 @@ namespace UndergroundMatch3.Systems
 {
     public class CheckSwapFinished : ComponentSystem
     {
-        public struct SwapInProgress
-        {
-            public int Length;
-            public EntityArray Entities;
-            public ComponentDataArray<PlayerSwap> Swaps;
-            public SubtractiveComponent<SwapSuccess> SwapsSuccess;
-        }
-
-        [Inject] private SwapInProgress _swapInProgress;
+        [Inject] private SystemsUtils.NotFinishedSwaps _notFinishedSwaps;
 
         protected override void OnUpdate()
         {
-            for (int i = 0; i < _swapInProgress.Length; i++)
+            for (int i = 0; i < _notFinishedSwaps.Length; i++)
             {
-                var swap = _swapInProgress.Swaps[i];
+                var swap = _notFinishedSwaps.Swaps[i];
                 var first = swap.First;
                 var second = swap.Second;
                 if (!EntityManager.HasComponent<TargetPosition>(first) &&
