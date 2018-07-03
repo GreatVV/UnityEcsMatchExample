@@ -2,13 +2,16 @@
 using Unity.Entities;
 using Unity.Mathematics;
 
-[Serializable]
-public struct TargetPosition : IComponentData
+namespace UndergroundMatch3.Components
 {
-    public float3 Value;
-
-    public TargetPosition(float3 value)
+    [Serializable]
+    public struct TargetPosition : IComponentData
     {
-        Value = value;
+        public float3 Value;
+
+        public TargetPosition(float3 value)
+        {
+            Value = value;
+        }
     }
 }

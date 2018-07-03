@@ -1,6 +1,9 @@
 ﻿using Unity.Entities;
 
-public class SelectedDataComponent : ComponentDataWrapper<Selected>
+namespace UndergroundMatch3.Components
 {
+    public class SelectedDataComponent : ComponentDataWrapper<Selected>
+    {
     
+    }
 }

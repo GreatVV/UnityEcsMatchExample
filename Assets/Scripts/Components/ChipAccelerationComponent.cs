@@ -1,6 +1,9 @@
 ﻿using Unity.Entities;
 
-public class ChipAccelerationComponent : ComponentDataWrapper<ChipAcceleration>
+namespace UndergroundMatch3.Components
 {
+    public class ChipAccelerationComponent : ComponentDataWrapper<ChipAcceleration>
+    {
     
+    }
 }

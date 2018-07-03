@@ -1,8 +1,11 @@
 ﻿using System;
 using Unity.Entities;
 
-[Serializable]
-public struct DestroyMarker : IComponentData
+namespace UndergroundMatch3.Components
 {
+    [Serializable]
+    public struct DestroyMarker : IComponentData
+    {
 
+    }
 }

@@ -1,4 +1,6 @@
 ﻿using NUnit.Framework;
+using UndergroundMatch3;
+using UndergroundMatch3.Components;
 using Unity.Mathematics;
 
 [TestFixture]

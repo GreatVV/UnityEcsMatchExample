@@ -1,13 +1,16 @@
 ﻿using System;
 using Unity.Entities;
 
-[Serializable]
-public struct ChipReference : IComponentData
+namespace UndergroundMatch3.Components
 {
-    public Entity Value;
-
-    public ChipReference(Entity value)
+    [Serializable]
+    public struct ChipReference : IComponentData
     {
-        Value = value;
+        public Entity Value;
+
+        public ChipReference(Entity value)
+        {
+            Value = value;
+        }
     }
 }

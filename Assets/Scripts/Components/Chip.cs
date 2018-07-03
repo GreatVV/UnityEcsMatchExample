@@ -1,8 +1,12 @@
 ﻿using System;
+using UndergroundMatch3.Data;
 using Unity.Entities;
 
-[Serializable]
-public struct Chip : IComponentData
+namespace UndergroundMatch3.Components
 {
-    public ChipColor Color;
+    [Serializable]
+    public struct Chip : IComponentData
+    {
+        public ChipColor Color;
+    }
 }

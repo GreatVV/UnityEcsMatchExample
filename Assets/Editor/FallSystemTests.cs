@@ -1,5 +1,8 @@
 ﻿using System.Collections.Generic;
 using NUnit.Framework;
+using UndergroundMatch3.Data;
+using UndergroundMatch3.Data.Steps;
+using UndergroundMatch3.Systems;
 using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
@@ -31,17 +34,12 @@ public class FallSystemTests : BaseWorldTests
         };
 
         var slotCache = new Dictionary<int2, Entity>();
-        var createSlots = new CreateSlotsStep(slotCache, Vector3.zero);
+        var sceneConfiguration = CreateTestSceneConfiguration();
+        var configuration = CreateTestConfiguration();
+        var createSlots = new CreateSlotsStep(slotCache, sceneConfiguration);
         createSlots.Apply(levelDescription, entityManager);
 
-        var createChips = new CreateChipsStep(new[]
-        {
-            CreateChipPrefab(0),
-            CreateChipPrefab((ChipColor) 1),
-            CreateChipPrefab((ChipColor)2),
-            CreateChipPrefab((ChipColor)3),
-            CreateChipPrefab((ChipColor)4),
-        });
+        var createChips = new CreateChipsStep(configuration);
         createChips.Apply(levelDescription, entityManager);
 
         var nextY = FallSystem.GetNextEmptyRow(entityManager, slotCache, new int2(0, 2));
@@ -69,17 +67,13 @@ public class FallSystemTests : BaseWorldTests
         };
 
         var slotCache = new Dictionary<int2, Entity>();
-        var createSlots = new CreateSlotsStep(slotCache, Vector3.zero);
+        var sceneConfiguration = CreateTestSceneConfiguration();
+        var configuration = CreateTestConfiguration();
+
+        var createSlots = new CreateSlotsStep(slotCache, sceneConfiguration);
         createSlots.Apply(levelDescription, entityManager);
 
-        var createChips = new CreateChipsStep(new[]
-        {
-            CreateChipPrefab(0),
-            CreateChipPrefab((ChipColor) 1),
-            CreateChipPrefab((ChipColor)2),
-            CreateChipPrefab((ChipColor)3),
-            CreateChipPrefab((ChipColor)4),
-        });
+        var createChips = new CreateChipsStep(configuration);
         createChips.Apply(levelDescription, entityManager);
 
         var nextY = FallSystem.GetNextEmptyRow(entityManager, slotCache, new int2(0, 2));

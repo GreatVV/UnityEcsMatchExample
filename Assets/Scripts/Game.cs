@@ -1,88 +1,79 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq.Expressions;
+﻿using System.Collections.Generic;
 using TMPro;
+using UndergroundMatch3.Components;
+using UndergroundMatch3.Data;
+using UndergroundMatch3.Data.Steps;
+using UndergroundMatch3.Systems;
+using UndergroundMatch3.UI.Screens;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
-using Unity.Transforms;
 using UnityEngine;
 
-public class Game : MonoBehaviour
+namespace UndergroundMatch3
 {
-	public Camera Camera;
-	public LevelDescriptionAsset Level;
-	public GameObjectEntity[] ChipPrefabs;
-	public Transform Center;
-	private EntityManager _entityManager;
-	public TextMeshProUGUI Timer;
-	public TextMeshProUGUI ScoreLabel;
-	public GameObject GameOverScreen;
-	public Transform DeathPosition;
-	public GameObject SelectionPrefab;
-	public GameObject ExplosionPrefab;
-	public float Speed = 20;
-	public float Acceleration = 10;
-
-	public LevelDescription LevelDescription { get; set; }
-
-	public readonly Dictionary<int2, Entity> SlotCache = new Dictionary<int2, Entity>();
-
-	public void Start()
+	public class Game : MonoBehaviour
 	{
-		LevelDescription = Level.Value;
+		public GameOverScreen GameOverScreen;
+		public GameScreen GameScreen;
 
-		_entityManager = World.Active.GetOrCreateManager<EntityManager>();
-		ProcessLevelDescription();
-		World.Active.GetOrCreateManager<UserControlSystem>().Setup(this);
-		World.Active.GetOrCreateManager<FindCombinationsSystem>().Setup(SlotCache, LevelDescription);
-		World.Active.GetOrCreateManager<GeneratorSystem>().Setup(ChipPrefabs, SlotCache, LevelDescription);
-		World.Active.GetOrCreateManager<FallSystem>().Setup(SlotCache, LevelDescription);
-		World.Active.GetOrCreateManager<GameTimerSystem>().Setup(Timer, GameOverScreen);
-		World.Active.GetOrCreateManager<MoveDeadChipsToScore>().Setup(DeathPosition.position, Speed, Acceleration);
-		World.Active.GetOrCreateManager<ShowSelectionSystem>().Setup(SelectionPrefab);
-		World.Active.GetOrCreateManager<SyncScoreSystem>().Setup(ScoreLabel);
-		World.Active.GetOrCreateManager<PlayExplosionOnChipsDestroySystem>().Setup(ExplosionPrefab);
+		public ConfigurationAsset Configuration;
+		public SceneConfiguration SceneConfiguration;
+		public LevelDescription LevelDescription { get; set; }
 
-		_entityManager.CreateEntity(typeof(AnalyzeField));
+		private EntityManager _entityManager;
 
-		var score = _entityManager.CreateEntity();
-		_entityManager.AddComponentData(score, new Score() {Value = 0});
+		public readonly Dictionary<int2, Entity> SlotCache = new Dictionary<int2, Entity>();
 
-		var time = _entityManager.CreateEntity();
-		_entityManager.AddComponentData(time, new GameTime() {Seconds = LevelDescription.Time});
-	}
-
-	public void ProcessLevelDescription()
-	{
-		var steps = new List<ICreationPipelineStep>();
-		steps.Add(new CreateSlotsStep(SlotCache, Center.position));
-		steps.Add(new CreateChipsStep(ChipPrefabs));
-
-		foreach (var creationPipelineStep in steps)
+		public void Start()
 		{
-			creationPipelineStep.Apply(LevelDescription, _entityManager);
-		}
-	}
+			LevelDescription = SceneConfiguration.Level.Value;
 
-	private void OnDestroy()
-	{
-		var allEntities = _entityManager.GetAllEntities(Allocator.Temp);
-		for (int i = allEntities.Length - 1; i >= 0; i--)
+			var w = World.Active;
+			_entityManager = w.GetOrCreateManager<EntityManager>();
+			ProcessLevelDescription();
+			w.GetOrCreateManager<UserControlSystem>().Setup(SceneConfiguration, SlotCache);
+			w.GetOrCreateManager<FindCombinationsSystem>().Setup(SlotCache, LevelDescription);
+			w.GetOrCreateManager<GeneratorSystem>().Setup(Configuration, SlotCache, LevelDescription);
+			w.GetOrCreateManager<FallSystem>().Setup(SlotCache, LevelDescription);
+			w.GetOrCreateManager<GameTimerSystem>().Setup(GameScreen, GameOverScreen);
+			w.GetOrCreateManager<MoveDeadChipsToScore>().Setup(SceneConfiguration, Configuration);
+			w.GetOrCreateManager<ShowSelectionSystem>().Setup(Configuration);
+			w.GetOrCreateManager<SyncScoreSystem>().Setup(GameScreen);
+			w.GetOrCreateManager<PlayExplosionOnChipsDestroySystem>().Setup(Configuration);
+
+			_entityManager.CreateEntity(typeof(AnalyzeField));
+
+			var score = _entityManager.CreateEntity();
+			_entityManager.AddComponentData(score, new Score() {Value = 0});
+
+			var time = _entityManager.CreateEntity();
+			_entityManager.AddComponentData(time, new GameTime() {Seconds = LevelDescription.Time});
+		}
+
+		public void ProcessLevelDescription()
 		{
-			_entityManager.DestroyEntity(allEntities[i]);
+			var steps = new List<ICreationPipelineStep>();
+			steps.Add(new CreateSlotsStep(SlotCache, SceneConfiguration));
+			steps.Add(new CreateChipsStep(Configuration));
+
+			foreach (var creationPipelineStep in steps)
+			{
+				creationPipelineStep.Apply(LevelDescription, _entityManager);
+			}
 		}
-		allEntities.Dispose();
+
+		private void OnDestroy()
+		{
+			var allEntities = _entityManager.GetAllEntities(Allocator.Temp);
+			for (int i = allEntities.Length - 1; i >= 0; i--)
+			{
+				_entityManager.DestroyEntity(allEntities[i]);
+			}
+			allEntities.Dispose();
+		}
+
+
+
 	}
-
-	public int2 GetIndex(Vector3 worldPosition)
-	{
-		var localPoint = worldPosition - Center.transform.position;
-		localPoint.x = localPoint.x + Level.Value.Width / 2f ;
-		localPoint.y = localPoint.y + Level.Value.Height / 2f ;
-
-		return new int2(Mathf.FloorToInt(localPoint.x), Mathf.FloorToInt(localPoint.y));
-	}
-
 }

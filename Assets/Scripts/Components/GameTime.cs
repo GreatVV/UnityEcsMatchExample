@@ -1,8 +1,11 @@
 ﻿using System;
 using Unity.Entities;
 
-[Serializable]
-public struct GameTime : IComponentData
+namespace UndergroundMatch3.Components
 {
-    public float Seconds;
+    [Serializable]
+    public struct GameTime : IComponentData
+    {
+        public float Seconds;
+    }
 }

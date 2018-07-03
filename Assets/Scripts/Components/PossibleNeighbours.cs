@@ -1,8 +1,11 @@
 ﻿using System;
 using Unity.Entities;
 
-[Serializable]
-public struct PossibleNeighbours : IComponentData
+namespace UndergroundMatch3.Components
 {
-    public Neighbours Value;
+    [Serializable]
+    public struct PossibleNeighbours : IComponentData
+    {
+        public Neighbours Value;
+    }
 }

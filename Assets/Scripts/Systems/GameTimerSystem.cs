@@ -1,46 +1,51 @@
-﻿using System.Runtime.InteropServices;
-using TMPro;
+﻿using TMPro;
+using UndergroundMatch3.Components;
+using UndergroundMatch3.UI.Screens;
 using Unity.Entities;
 using UnityEngine;
+using UnityEngine.Analytics;
 
-public class GameTimerSystem : ComponentSystem
+namespace UndergroundMatch3.Systems
 {
-    private struct GameTimerGroup
+    public class GameTimerSystem : ComponentSystem
     {
-        public int Length;
-        public EntityArray Entities;
-        public ComponentDataArray<GameTime> TimeLeft;
-        public SubtractiveComponent<Pause> Pause;
-        public SubtractiveComponent<TimeOver> TimeOver;
-    }
-
-    [Inject] private GameTimerGroup _group;
-    private TextMeshProUGUI _timeLeft;
-    private GameObject _gameOverScreen;
-
-    public void Setup(TextMeshProUGUI timeLeft, GameObject gameOverScreen)
-    {
-        _timeLeft = timeLeft;
-        _gameOverScreen = gameOverScreen;
-    }
-
-
-    protected override void OnUpdate()
-    {
-        var time = Time.deltaTime;
-        for (int i = 0; i < _group.Length; i++)
+        private struct GameTimerGroup
         {
-            var timeLeft = _group.TimeLeft[i];
-            timeLeft.Seconds -= time;
-            _group.TimeLeft[i] = timeLeft;
+            public int Length;
+            public EntityArray Entities;
+            public ComponentDataArray<GameTime> TimeLeft;
+            public SubtractiveComponent<Pause> Pause;
+            public SubtractiveComponent<TimeOver> TimeOver;
+        }
 
-            _timeLeft.text = ((int) timeLeft.Seconds).ToString();
+        [Inject] private GameTimerGroup _group;
+        private TextMeshProUGUI _timeLeft;
+        private GameOverScreen _gameOverScreen;
 
-            if (timeLeft.Seconds < 0)
+        public void Setup(GameScreen gameScreen, GameOverScreen gameOverScreen)
+        {
+            _timeLeft = gameScreen.Timer;
+            _gameOverScreen = gameOverScreen;
+        }
+
+
+        protected override void OnUpdate()
+        {
+            var time = Time.deltaTime;
+            for (int i = 0; i < _group.Length; i++)
             {
-                PostUpdateCommands.AddComponent(_group.Entities[i], new Pause());
-                PostUpdateCommands.AddComponent(_group.Entities[i], new TimeOver());
-                _gameOverScreen.SetActive(true);
+                var timeLeft = _group.TimeLeft[i];
+                timeLeft.Seconds -= time;
+                _group.TimeLeft[i] = timeLeft;
+
+                _timeLeft.text = ((int) timeLeft.Seconds).ToString();
+
+                if (timeLeft.Seconds < 0)
+                {
+                    PostUpdateCommands.AddComponent(_group.Entities[i], new Pause());
+                    PostUpdateCommands.AddComponent(_group.Entities[i], new TimeOver());
+                    _gameOverScreen.Show(true);
+                }
             }
         }
     }

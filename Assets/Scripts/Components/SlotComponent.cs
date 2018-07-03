@@ -1,6 +1,9 @@
 ﻿using Unity.Entities;
 
-public class SlotComponent : ComponentDataWrapper<Slot>
+namespace UndergroundMatch3.Components
 {
+    public class SlotComponent : ComponentDataWrapper<Slot>
+    {
 
+    }
 }

@@ -2,6 +2,11 @@
 using System.Collections.Generic;
 using System.Xml.Schema;
 using NUnit.Framework;
+using UndergroundMatch3;
+using UndergroundMatch3.Components;
+using UndergroundMatch3.Data;
+using UndergroundMatch3.Data.Steps;
+using UndergroundMatch3.Systems;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
@@ -22,16 +27,18 @@ public class FieldDataTest : BaseWorldTests
         levelDescription.Time = 60;
 
         var game = new GameObject().AddComponent<Game>();
-        game.Level = ScriptableObject.CreateInstance<LevelDescriptionAsset>();
-        game.Level.Value = levelDescription;
+        game.SceneConfiguration = CreateTestSceneConfiguration();
+        var sceneConfiguration = game.SceneConfiguration;
+        sceneConfiguration.Level = ScriptableObject.CreateInstance<LevelDescriptionAsset>();
+        sceneConfiguration.Level.Value = levelDescription;
 
-        game.Center = new GameObject("Center").transform;
-        game.Center.position = new Vector3(1,1,0);
+        sceneConfiguration.Center = new GameObject("Center").transform;
+        sceneConfiguration.Center.position = new Vector3(1,1,0);
 
-        Assert.AreEqual(new int2(0,0), game.GetIndex(new Vector3(0.5f, 0.5f)));
-        Assert.AreEqual(new int2(1, 0), game.GetIndex(new Vector3(1.5f, 0.5f)));
-        Assert.AreEqual(new int2(0, 1), game.GetIndex(new Vector3(0.5f, 1.5f)));
-        Assert.AreEqual(new int2(1, 1), game.GetIndex(new Vector3(1.5f, 1.5f)));
+        Assert.AreEqual(new int2(0,0), sceneConfiguration.GetIndex(new Vector3(0.5f, 0.5f)));
+        Assert.AreEqual(new int2(1, 0), sceneConfiguration.GetIndex(new Vector3(1.5f, 0.5f)));
+        Assert.AreEqual(new int2(0, 1), sceneConfiguration.GetIndex(new Vector3(0.5f, 1.5f)));
+        Assert.AreEqual(new int2(1, 1), sceneConfiguration.GetIndex(new Vector3(1.5f, 1.5f)));
     }
 
 
@@ -47,7 +54,9 @@ public class FieldDataTest : BaseWorldTests
             Height = 5
         };
 
-        var creationPipeline = new CreateSlotsStep(new Dictionary<int2, Entity>(), Vector3.zero);
+        var sceneConfiguration = CreateTestSceneConfiguration();
+
+        var creationPipeline = new CreateSlotsStep(new Dictionary<int2, Entity>(), sceneConfiguration);
         creationPipeline.Apply(levelDescription, entityManager);
 
         //check
@@ -76,10 +85,13 @@ public class FieldDataTest : BaseWorldTests
             Height = 5
         };
 
-        var createSlots = new CreateSlotsStep(new Dictionary<int2, Entity>(), Vector3.zero);
+        var sceneConfiguration = CreateTestSceneConfiguration();
+        var configuration = CreateTestConfiguration();
+
+        var createSlots = new CreateSlotsStep(new Dictionary<int2, Entity>(), sceneConfiguration);
         createSlots.Apply(levelDescription, entityManager);
 
-        var createChips = new CreateChipsStep(new[] {CreateChipPrefab()});
+        var createChips = new CreateChipsStep(configuration);
         createChips.Apply(levelDescription, entityManager);
 
         //check
@@ -160,18 +172,13 @@ public class FieldDataTest : BaseWorldTests
         };
 
         var slotCache = new Dictionary<int2, Entity>();
-        var createSlots = new CreateSlotsStep(slotCache, Vector3.zero);
+        var sceneConfiguration = CreateTestSceneConfiguration();
+        var configuration = CreateTestConfiguration();
+        var createSlots = new CreateSlotsStep(slotCache, sceneConfiguration);
         createSlots.Apply(levelDescription, entityManager);
 
 
-        var createChips = new CreateChipsStep(new[]
-        {
-            CreateChipPrefab(0),
-            CreateChipPrefab((ChipColor) 1),
-            CreateChipPrefab((ChipColor)2),
-            CreateChipPrefab((ChipColor)3),
-            CreateChipPrefab((ChipColor)4),
-        });
+        var createChips = new CreateChipsStep(configuration);
         createChips.Apply(levelDescription, entityManager);
 
         var commandBuffer = new EntityCommandBuffer(Allocator.Temp);
@@ -257,19 +264,15 @@ public class FieldDataTest : BaseWorldTests
             }
         };
 
+        var sceneConfiguration = CreateTestSceneConfiguration();
+        var configuration = CreateTestConfiguration();
+
         var slotCache = new Dictionary<int2, Entity>();
-        var createSlots = new CreateSlotsStep(slotCache, Vector3.zero);
+        var createSlots = new CreateSlotsStep(slotCache, sceneConfiguration);
         createSlots.Apply(levelDescription, entityManager);
 
 
-        var createChips = new CreateChipsStep(new[]
-        {
-            CreateChipPrefab(0),
-            CreateChipPrefab((ChipColor) 1),
-            CreateChipPrefab((ChipColor)2),
-            CreateChipPrefab((ChipColor)3),
-            CreateChipPrefab((ChipColor)4),
-        });
+        var createChips = new CreateChipsStep(configuration);
         createChips.Apply(levelDescription, entityManager);
 
         var combinationList = new NativeList<Entity>(64, Allocator.Temp);
@@ -355,19 +358,14 @@ public class FieldDataTest : BaseWorldTests
             }
         };
 
+        var sceneConfiguration = CreateTestSceneConfiguration();
+        var configuration = CreateTestConfiguration();
         var slotCache = new Dictionary<int2, Entity>();
-        var createSlots = new CreateSlotsStep(slotCache, Vector3.zero);
+        var createSlots = new CreateSlotsStep(slotCache, sceneConfiguration);
         createSlots.Apply(levelDescription, entityManager);
 
 
-        var createChips = new CreateChipsStep(new[]
-        {
-            CreateChipPrefab(0),
-            CreateChipPrefab((ChipColor) 1),
-            CreateChipPrefab((ChipColor)2),
-            CreateChipPrefab((ChipColor)3),
-            CreateChipPrefab((ChipColor)4),
-        });
+        var createChips = new CreateChipsStep(configuration);
         createChips.Apply(levelDescription, entityManager);
 
         var combinationList = new NativeList<Entity>(64, Allocator.Temp);

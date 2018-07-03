@@ -1,12 +1,16 @@
-﻿using Unity.Entities;
+﻿using UndergroundMatch3.Data;
+using Unity.Entities;
 
-public class ChipComponent : ComponentDataWrapper<Chip>
+namespace UndergroundMatch3.Components
 {
-    public void UpdateColor(ChipColor color)
+    public class ChipComponent : ComponentDataWrapper<Chip>
     {
-        Value = new Chip()
+        public void UpdateColor(ChipColor color)
         {
-            Color = color
-        };
+            Value = new Chip()
+            {
+                Color = color
+            };
+        }
     }
 }

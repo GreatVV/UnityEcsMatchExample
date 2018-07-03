@@ -1,6 +1,9 @@
 ﻿using Unity.Entities;
 
-public class TargetPositionComponent : ComponentDataWrapper<TargetPosition>
+namespace UndergroundMatch3.Components
 {
+    public class TargetPositionComponent : ComponentDataWrapper<TargetPosition>
+    {
 
+    }
 }

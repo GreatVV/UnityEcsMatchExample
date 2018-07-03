@@ -1,29 +1,33 @@
-﻿using Unity.Entities;
+﻿using UndergroundMatch3.Components;
+using Unity.Entities;
 
-public class CheckSwapFinished : ComponentSystem
+namespace UndergroundMatch3.Systems
 {
-    public struct SwapInProgress
+    public class CheckSwapFinished : ComponentSystem
     {
-        public int Length;
-        public EntityArray Entities;
-        public ComponentDataArray<PlayerSwap> Swaps;
-        public SubtractiveComponent<SwapSuccess> SwapsSuccess;
-    }
-
-    [Inject] private SwapInProgress _swapInProgress;
-
-    protected override void OnUpdate()
-    {
-        for (int i = 0; i < _swapInProgress.Length; i++)
+        public struct SwapInProgress
         {
-            var swap = _swapInProgress.Swaps[i];
-            var first = swap.First;
-            var second = swap.Second;
-            if (!EntityManager.HasComponent<TargetPosition>(first) &&
-                !EntityManager.HasComponent<TargetPosition>(second))
+            public int Length;
+            public EntityArray Entities;
+            public ComponentDataArray<PlayerSwap> Swaps;
+            public SubtractiveComponent<SwapSuccess> SwapsSuccess;
+        }
+
+        [Inject] private SwapInProgress _swapInProgress;
+
+        protected override void OnUpdate()
+        {
+            for (int i = 0; i < _swapInProgress.Length; i++)
             {
-                PostUpdateCommands.CreateEntity();
-                PostUpdateCommands.AddComponent(new AnalyzeField());
+                var swap = _swapInProgress.Swaps[i];
+                var first = swap.First;
+                var second = swap.Second;
+                if (!EntityManager.HasComponent<TargetPosition>(first) &&
+                    !EntityManager.HasComponent<TargetPosition>(second))
+                {
+                    PostUpdateCommands.CreateEntity();
+                    PostUpdateCommands.AddComponent(new AnalyzeField());
+                }
             }
         }
     }

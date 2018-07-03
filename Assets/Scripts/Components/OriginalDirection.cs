@@ -2,8 +2,11 @@
 using Unity.Entities;
 using Unity.Mathematics;
 
-[Serializable]
-public struct OriginalDirection : IComponentData
+namespace UndergroundMatch3.Components
 {
-    public float3 Value;
+    [Serializable]
+    public struct OriginalDirection : IComponentData
+    {
+        public float3 Value;
+    }
 }

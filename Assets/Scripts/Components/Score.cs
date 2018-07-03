@@ -1,8 +1,11 @@
 ﻿using System;
 using Unity.Entities;
 
-[Serializable]
-public struct Score : IComponentData
+namespace UndergroundMatch3.Components
 {
-    public int Value;
+    [Serializable]
+    public struct Score : IComponentData
+    {
+        public int Value;
+    }
 }

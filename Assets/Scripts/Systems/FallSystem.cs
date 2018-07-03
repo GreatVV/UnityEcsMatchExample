@@ -1,85 +1,89 @@
 ﻿using System.Collections.Generic;
+using UndergroundMatch3.Components;
+using UndergroundMatch3.Data;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
-using UnityEngine;
 
-[UpdateBefore(typeof(DestroySystem))]
-[UpdateAfter(typeof(FindCombinationsSystem))]
-public class FallSystem : ComponentSystem
+namespace UndergroundMatch3.Systems
 {
-    private Dictionary<int2, Entity> _slotCache;
-    private LevelDescription _levelDescription;
-
-    public struct AnalyzeFieldFlag
+    [UpdateBefore(typeof(DestroySystem))]
+    [UpdateAfter(typeof(FindCombinationsSystem))]
+    public class FallSystem : ComponentSystem
     {
-        public int Length;
-        [ReadOnly] public ComponentDataArray<AnalyzeField> AnalyzeField;
-    }
+        private Dictionary<int2, Entity> _slotCache;
+        private LevelDescription _levelDescription;
 
-    [Inject] private AnalyzeFieldFlag _analyzeFieldFlag;
-
-    public void Setup(Dictionary<int2, Entity> slotCache, LevelDescription levelDescription)
-    {
-        _slotCache = slotCache;
-        _levelDescription = levelDescription;
-    }
-
-    protected override void OnUpdate()
-    {
-        if (_analyzeFieldFlag.Length == 0)
+        public struct AnalyzeFieldFlag
         {
-            return;
+            public int Length;
+            [ReadOnly] public ComponentDataArray<AnalyzeField> AnalyzeField;
         }
 
-        for (int column = 0; column < _levelDescription.Width; column++)
+        [Inject] private AnalyzeFieldFlag _analyzeFieldFlag;
+
+        public void Setup(Dictionary<int2, Entity> slotCache, LevelDescription levelDescription)
         {
-            for (int row = 1; row < _levelDescription.Height; row++)
+            _slotCache = slotCache;
+            _levelDescription = levelDescription;
+        }
+
+        protected override void OnUpdate()
+        {
+            if (_analyzeFieldFlag.Length == 0)
             {
-                var position = new int2(column, row);
-                var slot = _slotCache[position];
-                if (EntityManager.HasComponent<ChipReference>(slot))
+                return;
+            }
+
+            for (int column = 0; column < _levelDescription.Width; column++)
+            {
+                for (int row = 1; row < _levelDescription.Height; row++)
                 {
-                    MoveDown(slot, position);
+                    var position = new int2(column, row);
+                    var slot = _slotCache[position];
+                    if (EntityManager.HasComponent<ChipReference>(slot))
+                    {
+                        MoveDown(slot, position);
+                    }
                 }
             }
         }
-    }
 
-    public static int GetNextEmptyRow(EntityManager entityManager, Dictionary<int2, Entity> slotsCache, int2 position)
-    {
-        position.y -= 1;
-
-        var slot = slotsCache[position];
-        while (position.y >= 0 && !entityManager.HasComponent<ChipReference>(slot))
+        public static int GetNextEmptyRow(EntityManager entityManager, Dictionary<int2, Entity> slotsCache, int2 position)
         {
             position.y -= 1;
-            if (slotsCache.ContainsKey(position))
+
+            var slot = slotsCache[position];
+            while (position.y >= 0 && !entityManager.HasComponent<ChipReference>(slot))
             {
-                slot = slotsCache[position];
+                position.y -= 1;
+                if (slotsCache.ContainsKey(position))
+                {
+                    slot = slotsCache[position];
+                }
             }
+
+            return position.y + 1;
         }
 
-        return position.y + 1;
-    }
-
-    void MoveDown(Entity slot, int2 position)
-    {
-        var nextRowPos = GetNextEmptyRow(EntityManager, _slotCache, position);
-        if (nextRowPos != position.y)
+        void MoveDown(Entity slot, int2 position)
         {
-            var newPosition = new int2(position.x, nextRowPos);
-            var chip = EntityManager.GetComponentData<ChipReference>(slot).Value;
-            FieldUtils.MoveChipToSlot(EntityManager, chip, _slotCache[newPosition]);
-        }
-        else
-        {
-            var chip = EntityManager.GetComponentData<ChipReference>(slot).Value;
-            if (!EntityManager.HasComponent<TargetPosition>(chip))
+            var nextRowPos = GetNextEmptyRow(EntityManager, _slotCache, position);
+            if (nextRowPos != position.y)
             {
-                PostUpdateCommands.AddComponent(chip,
-                    new TargetPosition(EntityManager.GetComponentData<Position>(slot).Value));
+                var newPosition = new int2(position.x, nextRowPos);
+                var chip = EntityManager.GetComponentData<ChipReference>(slot).Value;
+                FieldUtils.MoveChipToSlot(EntityManager, chip, _slotCache[newPosition]);
+            }
+            else
+            {
+                var chip = EntityManager.GetComponentData<ChipReference>(slot).Value;
+                if (!EntityManager.HasComponent<TargetPosition>(chip))
+                {
+                    PostUpdateCommands.AddComponent(chip,
+                        new TargetPosition(EntityManager.GetComponentData<Position>(slot).Value));
+                }
             }
         }
     }

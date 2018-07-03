@@ -1,33 +1,37 @@
 ﻿using TMPro;
+using UndergroundMatch3.Components;
+using UndergroundMatch3.UI.Screens;
 using Unity.Entities;
-using UnityEngine.AI;
 
-public class SyncScoreSystem : ComponentSystem
+namespace UndergroundMatch3.Systems
 {
-    private TextMeshProUGUI _scoreLabel;
-
-    public void Setup(TextMeshProUGUI scoreLabel)
+    public class SyncScoreSystem : ComponentSystem
     {
-        _scoreLabel = scoreLabel;
-    }
+        private TextMeshProUGUI _scoreLabel;
 
-    public struct ScoreScore
-    {
-        public int Length;
-        public ComponentDataArray<Score> Score;
-    }
-    [Inject] private ScoreScore _score;
-
-    private int _prevScore = -1;
-
-    protected override void OnUpdate()
-    {
-        if (_score.Length > 0)
+        public void Setup(GameScreen gameScreen)
         {
-            var value = _score.Score[0].Value;
-            if (value != _prevScore)
+            _scoreLabel = gameScreen.ScoreLabel;
+        }
+
+        public struct ScoreScore
+        {
+            public int Length;
+            public ComponentDataArray<Score> Score;
+        }
+        [Inject] private ScoreScore _score;
+
+        private int _prevScore = -1;
+
+        protected override void OnUpdate()
+        {
+            if (_score.Length > 0)
             {
-                _scoreLabel.text = value.ToString();
+                var value = _score.Score[0].Value;
+                if (value != _prevScore)
+                {
+                    _scoreLabel.text = value.ToString();
+                }
             }
         }
     }

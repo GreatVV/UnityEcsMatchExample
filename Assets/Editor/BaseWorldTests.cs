@@ -1,4 +1,7 @@
 ﻿using NUnit.Framework;
+using UndergroundMatch3;
+using UndergroundMatch3.Components;
+using UndergroundMatch3.Data;
 using Unity.Entities;
 using Unity.Rendering;
 using Unity.Transforms;
@@ -33,5 +36,29 @@ public class BaseWorldTests
         go.GetComponent<ChipComponent>().UpdateColor(color);
 
         return go.GetComponent<GameObjectEntity>();
+    }
+
+    protected SceneConfiguration CreateTestSceneConfiguration()
+    {
+        return new SceneConfiguration()
+        {
+            Center = new GameObject("Center").transform
+        };
+    }
+
+    protected ConfigurationAsset CreateTestConfiguration()
+    {
+        var configurationAsset = ScriptableObject.CreateInstance<ConfigurationAsset>();
+
+        configurationAsset.ChipPrefabs = new[]
+        {
+            CreateChipPrefab(0),
+            CreateChipPrefab((ChipColor) 1),
+            CreateChipPrefab((ChipColor)2),
+            CreateChipPrefab((ChipColor)3),
+            CreateChipPrefab((ChipColor)4),
+        };
+
+        return configurationAsset;
     }
 }

@@ -1,8 +1,11 @@
 ﻿using System;
 using Unity.Entities;
 
-[Serializable]
-public struct ChipAcceleration : IComponentData
+namespace UndergroundMatch3.Components
 {
-    public float Value;
+    [Serializable]
+    public struct ChipAcceleration : IComponentData
+    {
+        public float Value;
+    }
 }

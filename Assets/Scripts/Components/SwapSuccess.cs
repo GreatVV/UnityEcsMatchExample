@@ -1,14 +1,11 @@
 ﻿using System;
 using Unity.Entities;
 
-[Serializable]
-public struct SwapSuccess : IComponentData
+namespace UndergroundMatch3.Components
 {
-    public SwapResult Value;
-}
-
-public enum SwapResult
-{
-    Success = 0,
-    Fail = 1
+    [Serializable]
+    public struct SwapSuccess : IComponentData
+    {
+        public SwapResult Value;
+    }
 }

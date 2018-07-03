@@ -1,9 +1,11 @@
 ﻿using System;
-using System.ComponentModel;
 using Unity.Entities;
 
-[Serializable]
-public struct Selected : IComponentData
+namespace UndergroundMatch3.Components
 {
-    public int Number;
+    [Serializable]
+    public struct Selected : IComponentData
+    {
+        public int Number;
+    }
 }

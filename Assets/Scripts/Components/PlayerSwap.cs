@@ -1,9 +1,12 @@
 ﻿using System;
 using Unity.Entities;
 
-[Serializable]
-public struct PlayerSwap : IComponentData
+namespace UndergroundMatch3.Components
 {
-    public Entity First;
-    public Entity Second;
+    [Serializable]
+    public struct PlayerSwap : IComponentData
+    {
+        public Entity First;
+        public Entity Second;
+    }
 }

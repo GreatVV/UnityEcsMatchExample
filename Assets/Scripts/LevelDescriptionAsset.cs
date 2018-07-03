@@ -1,7 +1,11 @@
-﻿using UnityEngine;
+﻿using UndergroundMatch3.Data;
+using UnityEngine;
 
-[CreateAssetMenu]
-public class LevelDescriptionAsset : ScriptableObject
+namespace UndergroundMatch3
 {
-    public LevelDescription Value;
+    [CreateAssetMenu]
+    public class LevelDescriptionAsset : ScriptableObject
+    {
+        public LevelDescription Value;
+    }
 }

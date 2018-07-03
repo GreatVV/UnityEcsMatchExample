@@ -1,11 +1,12 @@
 ﻿using System;
-using System.ComponentModel;
 using Unity.Entities;
 using Unity.Mathematics;
-using UnityEngine;
 
-[Serializable]
-public struct SlotPosition : IComponentData
+namespace UndergroundMatch3.Components
 {
-    public int2 Value;
+    [Serializable]
+    public struct SlotPosition : IComponentData
+    {
+        public int2 Value;
+    }
 }

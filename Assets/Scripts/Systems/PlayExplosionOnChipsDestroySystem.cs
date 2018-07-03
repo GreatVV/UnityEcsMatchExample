@@ -1,32 +1,31 @@
-﻿using System;
-using System.Security.Policy;
-using Unity.Collections;
-using Unity.Entities;
-using Unity.Mathematics;
+﻿using Unity.Entities;
 using Unity.Transforms;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-public class PlayExplosionOnChipsDestroySystem : ComponentSystem
+namespace UndergroundMatch3.Systems
 {
-    [Inject] private UpdateScoreSystem.DyingDeadChips _deadChips;
-    [Inject] private SyncScoreSystem.ScoreScore _score;
-
-    private GameObject _explosion;
-
-    public void Setup(GameObject explosion)
+    public class PlayExplosionOnChipsDestroySystem : ComponentSystem
     {
-        _explosion = explosion;
-    }
+        [Inject] private UpdateScoreSystem.DyingDeadChips _deadChips;
+        [Inject] private SyncScoreSystem.ScoreScore _score;
 
-    protected override void OnUpdate()
-    {
-        if (_deadChips.Length > 0)
+        private GameObject _explosion;
+
+        public void Setup(ConfigurationAsset configurationAsset)
         {
-            Debug.Log("Play");
-            var entity = _deadChips.EntityArray[0];
-            var position = EntityManager.GetComponentData<Position>(entity).Value;
-            Object.Instantiate(_explosion, position, Quaternion.identity);
+            _explosion = configurationAsset.ExplosionPrefab;
+        }
+
+        protected override void OnUpdate()
+        {
+            if (_deadChips.Length > 0)
+            {
+                Debug.Log("Play");
+                var entity = _deadChips.EntityArray[0];
+                var position = EntityManager.GetComponentData<Position>(entity).Value;
+                Object.Instantiate(_explosion, position, Quaternion.identity);
+            }
         }
     }
 }
