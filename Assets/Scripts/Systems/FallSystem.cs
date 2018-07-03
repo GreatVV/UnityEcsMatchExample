@@ -55,7 +55,7 @@ namespace UndergroundMatch3.Systems
             position.y -= 1;
 
             var slot = slotsCache[position];
-            while (position.y >= 0 && !entityManager.HasComponent<ChipReference>(slot))
+            while (position.y >= 0 && !entityManager.HasComponent<ChipReference>(slot) && !entityManager.HasComponent<Blocked>(slot))
             {
                 position.y -= 1;
                 if (slotsCache.ContainsKey(position))

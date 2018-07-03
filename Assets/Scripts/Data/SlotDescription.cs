@@ -8,5 +8,6 @@ namespace UndergroundMatch3.Data
     {
         public int2 Position;
         public bool Generator;
+        public bool Blocked;
     }
 }

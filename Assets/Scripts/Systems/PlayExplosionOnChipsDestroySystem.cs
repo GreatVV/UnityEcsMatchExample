@@ -21,7 +21,6 @@ namespace UndergroundMatch3.Systems
         {
             if (_deadChips.Length > 0)
             {
-                Debug.Log("Play");
                 var entity = _deadChips.EntityArray[0];
                 var position = EntityManager.GetComponentData<Position>(entity).Value;
                 Object.Instantiate(_explosion, position, Quaternion.identity);

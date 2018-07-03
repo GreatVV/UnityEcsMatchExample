@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using TMPro;
 using UndergroundMatch3.Components;
 using UndergroundMatch3.Data;
@@ -25,13 +28,19 @@ namespace UndergroundMatch3
 
 		public readonly Dictionary<int2, Entity> SlotCache = new Dictionary<int2, Entity>();
 
-		public void Start()
+		public IEnumerator Start()
 		{
+			yield return null;
 			LevelDescription = SceneConfiguration.Level.Value;
 
 			var w = World.Active;
 			_entityManager = w.GetOrCreateManager<EntityManager>();
 			ProcessLevelDescription();
+			InjectToSystem(w);
+		}
+
+		private void InjectToSystem(World w)
+		{
 			w.GetOrCreateManager<UserControlSystem>().Setup(SceneConfiguration, SlotCache);
 			w.GetOrCreateManager<FindCombinationsSystem>().Setup(SlotCache, LevelDescription);
 			w.GetOrCreateManager<GeneratorSystem>().Setup(Configuration, SlotCache, LevelDescription);
@@ -42,13 +51,7 @@ namespace UndergroundMatch3
 			w.GetOrCreateManager<SyncScoreSystem>().Setup(GameScreen);
 			w.GetOrCreateManager<PlayExplosionOnChipsDestroySystem>().Setup(Configuration);
 
-			_entityManager.CreateEntity(typeof(AnalyzeField));
-
-			var score = _entityManager.CreateEntity();
-			_entityManager.AddComponentData(score, new Score() {Value = 0});
-
-			var time = _entityManager.CreateEntity();
-			_entityManager.AddComponentData(time, new GameTime() {Seconds = LevelDescription.Time});
+			FieldUtils.ChangeStateAllSystems(World.Active, true);
 		}
 
 		public void ProcessLevelDescription()
@@ -56,6 +59,8 @@ namespace UndergroundMatch3
 			var steps = new List<ICreationPipelineStep>();
 			steps.Add(new CreateSlotsStep(SlotCache, SceneConfiguration));
 			steps.Add(new CreateChipsStep(Configuration));
+			steps.Add(new CreateTimeStep());
+			steps.Add(new CreateScoreStep());
 
 			foreach (var creationPipelineStep in steps)
 			{
@@ -65,12 +70,15 @@ namespace UndergroundMatch3
 
 		private void OnDestroy()
 		{
-			var allEntities = _entityManager.GetAllEntities(Allocator.Temp);
+			var allEntities = _entityManager.GetAllEntities();
 			for (int i = allEntities.Length - 1; i >= 0; i--)
 			{
 				_entityManager.DestroyEntity(allEntities[i]);
 			}
 			allEntities.Dispose();
+
+			FieldUtils.ChangeStateAllSystems(World.Active, false);
+
 		}
 
 

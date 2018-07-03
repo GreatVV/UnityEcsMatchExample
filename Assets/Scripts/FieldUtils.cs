@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Linq;
+using System.Reflection;
 using UndergroundMatch3.Components;
 using Unity.Entities;
 using Unity.Mathematics;
@@ -123,6 +125,19 @@ namespace UndergroundMatch3
                         Value = entityManager.GetComponentData<Position>(slot).Value
                     }
                 );
+            }
+        }
+
+        public static void ChangeStateAllSystems(World world, bool state)
+        {
+            var systems = Assembly.GetAssembly(typeof(FieldUtils)).GetTypes().Where(x => x.IsSubclassOf(typeof(ComponentSystemBase)));
+            foreach (var systemType in systems)
+            {
+                var system = world.GetExistingManager(systemType);
+                if (system != null)
+                {
+                    ((ComponentSystemBase) system).Enabled = state;
+                }
             }
         }
     }

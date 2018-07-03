@@ -54,6 +54,8 @@ namespace UndergroundMatch3.Systems
         {
             _slotCache = slotCache;
             _levelDescription = levelDescription;
+
+            EntityManager.CreateEntity(typeof(AnalyzeField));
         }
 
         protected override void OnUpdate()

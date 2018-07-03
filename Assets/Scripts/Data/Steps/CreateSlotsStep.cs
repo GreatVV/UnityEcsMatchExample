@@ -38,6 +38,11 @@ namespace UndergroundMatch3.Data.Steps
                     {
                         entityManager.AddComponentData(slot, new Generator());
                     }
+
+                    if (slotDescription.Blocked)
+                    {
+                        entityManager.AddComponentData(slot, new Blocked());
+                    }
                 }
             }
         }

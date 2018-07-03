@@ -1,4 +1,5 @@
-﻿using UndergroundMatch3.Components;
+﻿using System.Runtime.CompilerServices;
+using UndergroundMatch3.Components;
 using Unity.Entities;
 using Unity.Transforms;
 using UnityEngine;
@@ -8,7 +9,6 @@ namespace UndergroundMatch3.Systems
     public class ShowSelectionSystem : ComponentSystem
     {
         private GameObject _selectionInstance;
-
 
         public void Setup(ConfigurationAsset configuration)
         {
